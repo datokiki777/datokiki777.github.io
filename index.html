@@ -6,7 +6,8 @@
   <title>Client Period Totals</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0b1220" />
+  <meta name="theme-color" content="#0b1220" id="themeColorMeta" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="mobile-web-app-capable" content="yes" />
 <script>
 (function () {
@@ -16,6 +17,14 @@
 
     const theme = localStorage.getItem("ct_theme_v1") || "dark";
     root.setAttribute("data-theme", theme);
+    const themeColorMeta = document.getElementById("themeColorMeta");
+if (themeColorMeta) {
+  if (theme === "light") {
+    themeColorMeta.setAttribute("content", "#c6d0dc");
+  } else {
+    themeColorMeta.setAttribute("content", "#0b1220");
+  }
+}
 
     if (localStorage.getItem("ct_controls_collapsed") === "1") {
       root.classList.add("controls-collapsed");

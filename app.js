@@ -794,8 +794,20 @@ function initTheme() {
   const t = getSavedTheme() || "dark";
   setTheme(t);
 
+  const themeColorMeta = document.getElementById("themeColorMeta");
+  if (themeColorMeta) {
+    themeColorMeta.setAttribute("content", t === "light" ? "#c6d0dc" : "#0b1220");
+  }
+
   themeSwitch?.addEventListener("change", () => {
-    setTheme(themeSwitch.checked ? "light" : "dark");
+    const nextTheme = themeSwitch.checked ? "light" : "dark";
+    setTheme(nextTheme);
+
+    const themeColorMeta = document.getElementById("themeColorMeta");
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute("content", nextTheme === "light" ? "#c6d0dc" : "#0b1220");
+    }
+
     render();
     if (appState.uiMode === "review") renderReview();
   });
@@ -3677,4 +3689,3 @@ window.addEventListener("popstate", () => {
     return;
   }
 });
-
