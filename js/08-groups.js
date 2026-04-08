@@ -69,14 +69,6 @@ async function renameGroup() {
 ========================= */
 
 async function deleteGroup() {
-  if (appState.groups.length <= 1) {
-    await askConfirm(
-      "You must keep at least 1 group.",
-      "Delete group",
-      { singleButton: true, okText: "OK" }
-    );
-    return;
-  }
 
   const g = activeGroup();
   const ok = await askConfirm(
@@ -87,6 +79,19 @@ async function deleteGroup() {
   if (!ok) return;
 
   appState.groups = appState.groups.filter((x) => x.id !== g.id);
+  // თუ აღარ დარჩა ჯგუფები → შექმენი ახალი ცარიელი
+if (appState.groups.length === 0) {
+  const newGroup = {
+    id: uuid(),
+    name: "New Group",
+    archived: false,
+    data: defaultGroupData()
+  };
+
+  appState.groups.push(newGroup);
+  appState.activeGroupId = newGroup.id;
+  appState.lastActiveGroupIdActive = newGroup.id;
+}
 
   const nextGroup = appState.groups.find((x) =>
     appState.workspaceMode === "archive"
@@ -210,10 +215,38 @@ function cloneAndReIdGroup(group) {
    Merge App State (for JSON import)
 ========================= */
 
+function normalizeMergeText(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function isSameMergeRow(a, b) {
+  return (
+    normalizeMergeText(a?.customer) === normalizeMergeText(b?.customer) &&
+    normalizeMergeText(a?.city) === normalizeMergeText(b?.city) &&
+    parseMoney(a?.gross) === parseMoney(b?.gross) &&
+    parseMoney(a?.net) === parseMoney(b?.net) &&
+    normalizeMergeText(a?.done || "none") === normalizeMergeText(b?.done || "none")
+  );
+}
+
 function mergeAppState(incomingState) {
   const incoming = normalizeAppState(incomingState);
 
-  if (!incoming?.groups?.length) return;
+  if (!incoming?.groups?.length) {
+    return {
+      groupsAdded: 0,
+      periodsAdded: 0,
+      rowsAdded: 0,
+      rowsSkipped: 0
+    };
+  }
+
+  const mergeTotals = {
+    groupsAdded: 0,
+    periodsAdded: 0,
+    rowsAdded: 0,
+    rowsSkipped: 0
+  };
 
   incoming.groups.forEach((incomingGroup) => {
     const existing = appState.groups.find((g) => {
@@ -221,31 +254,70 @@ function mergeAppState(incomingState) {
         (g?.name ?? "").toString().trim().toLowerCase() ===
         (incomingGroup?.name ?? "").toString().trim().toLowerCase();
 
-      const sameArchive = (g?.archived === true) === (incomingGroup?.archived === true);
+      const sameArchive =
+        (g?.archived === true) === (incomingGroup?.archived === true);
 
       return sameName && sameArchive;
     });
 
+    // თუ ასეთი group საერთოდ არ არსებობს → დაამატე მთლიანად
     if (!existing) {
       const cloned = cloneAndReIdGroup(incomingGroup);
       cloned.archived = incomingGroup.archived === true;
       appState.groups.push(cloned);
+
+      mergeTotals.groupsAdded++;
+      mergeTotals.periodsAdded += (cloned.data?.periods || []).length;
+      mergeTotals.rowsAdded += (cloned.data?.periods || []).reduce(
+        (sum, p) => sum + ((p.rows || []).length),
+        0
+      );
+
       return;
     }
 
     const incomingPeriods = normalizeGroupData(incomingGroup.data).periods;
 
     incomingPeriods.forEach((incomingPeriod) => {
-      const clonedPeriod = {
-        ...incomingPeriod,
-        id: uuid(),
-        rows: (incomingPeriod.rows || []).map((row) => ({
-          ...row,
-          id: uuid(),
-        })),
-      };
+      const existingPeriod = (existing.data?.periods || []).find((p) =>
+        (p?.from || "") === (incomingPeriod?.from || "") &&
+        (p?.to || "") === (incomingPeriod?.to || "")
+      );
 
-      existing.data.periods.push(clonedPeriod);
+      // თუ ასეთი period არ არსებობს → დაამატე მთლიანად
+      if (!existingPeriod) {
+        existing.data.periods.push({
+          ...incomingPeriod,
+          id: uuid(),
+          rows: (incomingPeriod.rows || []).map((row) => ({
+            ...row,
+            id: uuid()
+          }))
+        });
+
+        mergeTotals.periodsAdded++;
+        mergeTotals.rowsAdded += (incomingPeriod.rows || []).length;
+        return;
+      }
+
+      // თუ period არსებობს → დაამატე მხოლოდ ახალი rows
+      (incomingPeriod.rows || []).forEach((incomingRow) => {
+        const alreadyExists = (existingPeriod.rows || []).some((existingRow) =>
+          isSameMergeRow(existingRow, incomingRow)
+        );
+
+        if (alreadyExists) {
+          mergeTotals.rowsSkipped++;
+          return;
+        }
+
+        existingPeriod.rows.push({
+          ...incomingRow,
+          id: uuid()
+        });
+
+        mergeTotals.rowsAdded++;
+      });
     });
 
     const incomingRate = clampRate(
@@ -256,5 +328,5 @@ function mergeAppState(incomingState) {
   });
 
   appState = normalizeAppState(appState);
+  return mergeTotals;
 }
-

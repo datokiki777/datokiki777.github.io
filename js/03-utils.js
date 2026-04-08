@@ -107,14 +107,30 @@ function parseDateOnly(dateStr) {
 
   const s = String(dateStr).trim();
 
+  const buildSafeDate = (y, m, d) => {
+    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return null;
+
+    const out = new Date(y, m, d);
+
+    if (
+      Number.isNaN(out.getTime()) ||
+      out.getFullYear() !== y ||
+      out.getMonth() !== m ||
+      out.getDate() !== d
+    ) {
+      return null;
+    }
+
+    return out;
+  };
+
   if (s.includes("-")) {
     const parts = s.split("-");
     if (parts.length === 3) {
       const y = Number(parts[0]);
       const m = Number(parts[1]) - 1;
       const d = Number(parts[2]);
-      const out = new Date(y, m, d);
-      if (!Number.isNaN(out.getTime())) return out;
+      return buildSafeDate(y, m, d);
     }
   }
 
@@ -124,8 +140,7 @@ function parseDateOnly(dateStr) {
       const d = Number(parts[0]);
       const m = Number(parts[1]) - 1;
       const y = Number(parts[2]);
-      const out = new Date(y, m, d);
-      if (!Number.isNaN(out.getTime())) return out;
+      return buildSafeDate(y, m, d);
     }
   }
 

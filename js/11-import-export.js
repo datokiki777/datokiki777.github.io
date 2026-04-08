@@ -85,18 +85,23 @@ async function handleImportJsonChange(e) {
     );
 
     if (doMerge) {
-      mergeAppState(incoming);
-      saveState();
-      render();
-      if (appState.uiMode === "review") renderReview();
+  const summary = mergeAppState(incoming);
 
-      await askConfirm(
-        "JSON file merged successfully.",
-        "Import JSON",
-        { singleButton: true, okText: "OK" }
-      );
-      return;
-    }
+  saveState();
+  render();
+  if (appState.uiMode === "review") renderReview();
+
+  await askConfirm(
+    "JSON file merged successfully.\n\n" +
+    `Groups added: ${summary?.groupsAdded || 0}\n` +
+    `Periods added: ${summary?.periodsAdded || 0}\n` +
+    `Rows added: ${summary?.rowsAdded || 0}\n` +
+    `Duplicate rows skipped: ${summary?.rowsSkipped || 0}`,
+    "Import JSON",
+    { singleButton: true, okText: "OK" }
+  );
+  return;
+}
 
     const doReplace = await askConfirm(
       `Merge was not selected.\n\nDo you want to replace all current data on this device with:\n${file.name}\n\nThis cannot be undone.`,
@@ -695,19 +700,26 @@ async function handleImportExcelChange(e) {
     });
 
     const importedGroups = [...groupMap.values()].map((g) => ({
-      id: g.id,
-      name: g.name,
-      archived: g.archived,
-      data: {
-        defaultRatePercent: clampRate(g.data.defaultRatePercent),
-        periods: g.data.periods.map((p) => ({
-          id: p.id,
-          from: p.from,
-          to: p.to,
-          rows: p.rows.length ? p.rows : [emptyRow()]
-        }))
-      }
-    }));
+  id: g.id,
+  name: g.name,
+  archived: g.archived,
+  data: {
+    defaultRatePercent: clampRate(g.data.defaultRatePercent),
+    periods: g.data.periods.map((p) => ({
+      id: p.id,
+      from: p.from,
+      to: p.to,
+      rows: p.rows.length ? p.rows : [{
+        id: uuid(),
+        customer: "",
+        city: "",
+        gross: "",
+        net: "",
+        done: "none"
+      }]
+    }))
+  }
+}));
 
     if (!importedGroups.length) {
       await askConfirm(

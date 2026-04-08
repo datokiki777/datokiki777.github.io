@@ -242,13 +242,12 @@ function setMode(mode) {
     if (appState.uiMode === "review") {
       editView.hidden = true;
       reviewView.hidden = false;
-      if (globalSearchCard) globalSearchCard.hidden = false;
-      renderReview();
-    } else {
-      reviewView.hidden = true;
-      reviewView.innerHTML = "";
-      if (globalSearchCard) globalSearchCard.hidden = true;
-      editView.hidden = false;
+    if (globalSearchCard) globalSearchCard.hidden = false;
+   } else {
+     reviewView.hidden = true;
+     reviewView.innerHTML = "";
+  if (globalSearchCard) globalSearchCard.hidden = true;
+     editView.hidden = false;
     }
   }
 
