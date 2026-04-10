@@ -1,4 +1,4 @@
-const CACHE = "client-totals-shell-v3.2";
+const CACHE = "client-totals-shell-v3.3";
 
 const CORE_ASSETS = [
   "./",
@@ -17,28 +17,48 @@ const CORE_ASSETS = [
 
   "./js/01-config.js",
   "./js/02-dom.js",
-  "./js/03-utils.js",
-  "./js/04-state.js",
-  "./js/05-storage.js",
-  "./js/06-render.js",
+  "./js/03-state.js",
+  "./js/04-storage.js",
+  "./js/05-utils-core.js",
   "./js/07-modals.js",
-  "./js/08-groups.js",
-  "./js/09-periods.js",
-  "./js/10-search.js",
-  "./js/11-import-export.js",
-  "./js/12-theme.js",
-  "./js/13-app.js",
-  "./js/14-debug.js"
+  "./js/10-calc-dates.js",
+  "./js/11-calc-status.js",
+  "./js/12-calc-totals.js",
+  "./js/13-calc-monthly.js",
+  "./js/14-search.js",
+  "./js/15-theme.js",
+  "./js/16-import-export.js",
+  "./js/20-actions-groups.js",
+  "./js/21-actions-periods.js",
+  "./js/22-actions-rows.js",
+  "./js/23-actions-status.js",
+  "./js/30-render-overview.js",
+  "./js/31-render-periods.js",
+  "./js/32-render-review.js",
+  "./js/33-render-monthly.js",
+  "./js/34-render-shared.js",
+  "./js/40-update-flow.js",
+  "./js/50-bind-events.js",
+  "./js/60-app-init.js",
+  "./js/99-debug.js",
+
+  "./icons/icon-152.png",
+  "./icons/icon-167.png",
+  "./icons/icon-180.png",
+  "./icons/icon-192.png",
+  "./icons/icon-192-maskable.png",
+  "./icons/icon-512.png",
+  "./icons/icon-512-maskable.png"
 ];
 
-// install
+// INSTALL
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) => cache.addAll(CORE_ASSETS))
   );
 });
 
-// activate
+// ACTIVATE
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -51,7 +71,7 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// fetch
+// FETCH
 self.addEventListener("fetch", (event) => {
   const req = event.request;
 
@@ -102,7 +122,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // დანარჩენი same-origin ფაილები -> cache first
+  // სურათები და სხვა same-origin ფაილები -> cache first
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
@@ -116,7 +136,7 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-// skip waiting only by user action
+// skip waiting მხოლოდ user action-ით
 self.addEventListener("message", (event) => {
   if (event.data && event.data.action === "skipWaiting") {
     self.skipWaiting();
