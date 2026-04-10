@@ -1,4 +1,4 @@
-const CACHE = "client-totals-shell-v3.4";
+const CACHE = "client-totals-shell-v3.3";
 
 const CORE_ASSETS = [
   "./",
@@ -37,6 +37,7 @@ const CORE_ASSETS = [
   "./js/32-render-review.js",
   "./js/33-render-monthly.js",
   "./js/34-render-shared.js",
+  "./js/35-ui-sync.js",
   "./js/40-update-flow.js",
   "./js/50-bind-events.js",
   "./js/60-app-init.js",

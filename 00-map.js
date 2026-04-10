@@ -210,6 +210,22 @@ SHARED UI (no full render):
 - updateGrandToggleUI()
 
 ═══════════════════════════════════════
+35-ui-sync.js
+═══════════════════════════════════════
+CENTRAL UI SYNC:
+- refreshUiChrome()
+  - setControlsForMode()
+  - updateGrandToggleUI()
+  - updateWorkspaceSwitchUI()
+  - renderGroupSelect()
+  - updateControlsButtonLabel()
+  - updateFloatingAddClientVisibility()
+  - html.is-edit class sync
+- refreshFullUiState()
+  - refreshUiChrome()
+  - updateAfterGlobalChange()
+
+═══════════════════════════════════════
 40-update-flow.js
 ═══════════════════════════════════════
 GRANULAR UPDATE ORCHESTRATORS:
