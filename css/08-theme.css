@@ -453,6 +453,16 @@ html[data-theme="light"] .month-label{
   color:#0f172a;
 }
 
+html[data-theme="light"] .overview-duration{
+  color:#1e293b;
+  opacity:1;
+  font-weight:900;
+}
+
+html[data-theme="light"] .overview-duration span{
+  color:#1e293b;
+}
+
 /* =========================================================
    18) Period Collapse Button Light Theme
 ========================================================= */
