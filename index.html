@@ -17,32 +17,22 @@
   <meta name="theme-color" content="#0b1220" id="themeColorMeta" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="mobile-web-app-capable" content="yes" />
+
+<!-- REMOVED: inline localStorage preload script -->
+<!-- Theme and UI state are now loaded asynchronously via IndexedDB -->
 <script>
-(function () {
-  try {
-    const root = document.documentElement;
-    root.classList.add("app-preload");
-
-    const theme = localStorage.getItem("ct_theme_v1") || "dark";
-    root.setAttribute("data-theme", theme);
-    const themeColorMeta = document.getElementById("themeColorMeta");
-if (themeColorMeta) {
-  if (theme === "light") {
-    themeColorMeta.setAttribute("content", "#c6d0dc");
-  } else {
-    themeColorMeta.setAttribute("content", "#0b1220");
-  }
-}
-
-    if (localStorage.getItem("ct_controls_collapsed") === "1") {
-      root.classList.add("controls-collapsed");
-    }
-
-    if (localStorage.getItem("ct_summary_collapsed") === "1") {
-      root.classList.add("summary-collapsed");
-    }
-  } catch (e) {}
-})();
+  // Only set preload class and default theme to prevent flash
+  (function () {
+    try {
+      const root = document.documentElement;
+      root.classList.add("app-preload");
+      
+      // Set default dark theme to prevent flash, will be updated after IndexedDB loads
+      root.setAttribute("data-theme", "dark");
+      
+      // No localStorage reads here - will be handled by initThemeAsync()
+    } catch (e) {}
+  })();
 </script>
 
 </head>
@@ -282,13 +272,13 @@ if (themeColorMeta) {
       <div class="table-wrap">
         <table class="tbl">
           <thead>
-          <tr>
-           <th style="width: 30%">Customer</th>
-           <th style="width: 16%">Gross</th>
-           <th style="width: 16%">Net</th>
-           <th style="width: 16%">City</th>
-           <th class="done-head" style="width: 8%">Done</th>
-           <th style="width: 14%">Actions</th>
+            <tr>
+             <th style="width: 30%">Customer</th>
+             <th style="width: 16%">Gross</th>
+             <th style="width: 16%">Net</th>
+             <th style="width: 16%">City</th>
+             <th class="done-head" style="width: 8%">Done</th>
+             <th style="width: 14%">Actions</th>
           </tr>
        </thead>
 
@@ -301,12 +291,12 @@ if (themeColorMeta) {
               <td class="total-net">0.00</td>
             <td class="total-my">
             <span class="pill">My €: <b class="my-eur">0.00</b></span>
-                   </td>
-                  <td></td>
-                <td></td>
-             </tr>
+                    </td>
+                   <td></td>
+                 <td></td>
+              </tr>
         </tfoot>
-         </table>
+          </table>
       </div>
     </div>
   </section>
@@ -542,21 +532,39 @@ if (themeColorMeta) {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  
-  <script src="js/01-config.js"></script>
+
+<script src="js/01-config.js"></script>
 <script src="js/02-dom.js"></script>
-<script src="js/03-utils.js"></script>
-<script src="js/05-storage.js"></script>
-<script src="js/04-state.js"></script>
-<script src="js/09-periods.js"></script>
+<script src="js/03-state.js"></script>
+<script src="js/04-storage.js"></script>
+<script src="js/05-utils-core.js"></script>
+
+<script src="js/10-calc-dates.js"></script>
+<script src="js/11-calc-status.js"></script>
+<script src="js/12-calc-totals.js"></script>
+<script src="js/13-calc-monthly.js"></script>
+
+<script src="js/20-actions-groups.js"></script>
+<script src="js/21-actions-periods.js"></script>
+<script src="js/22-actions-rows.js"></script>
+<script src="js/23-actions-status.js"></script>
+
 <script src="js/07-modals.js"></script>
-<script src="js/06-render.js"></script>
-<script src="js/08-groups.js"></script>
-<script src="js/10-search.js"></script>
-<script src="js/11-import-export.js"></script>
-<script src="js/12-theme.js"></script>
-<script src="js/13-app.js"></script>
-<script src="js/14-debug.js"></script>
+<script src="js/14-search.js"></script>           <!-- გადარქმეული -->
+<script src="js/16-import-export.js"></script>    <!-- გადარქმეული -->
+
+<script src="js/30-render-overview.js"></script>
+<script src="js/31-render-periods.js"></script>
+<script src="js/32-render-review.js"></script>
+<script src="js/33-render-monthly.js"></script>
+<script src="js/34-render-shared.js"></script>
+
+<script src="js/15-theme.js"></script>
+
+<script src="js/40-update-flow.js"></script>
+<script src="js/50-bind-events.js"></script>
+<script src="js/60-app-init.js"></script>
+<script src="js/99-debug.js"></script>
       
 </body>
 </html>
