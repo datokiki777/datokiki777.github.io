@@ -195,7 +195,7 @@
 .kpi{
   border:1px solid var(--line);
   border-radius:14px;
-  padding:14px;
+  padding:10px 12px;
   background:linear-gradient(
     180deg,
     rgba(255,255,255,.06),
@@ -205,6 +205,11 @@
     inset 0 1px 0 rgba(255,255,255,.04),
     0 6px 14px rgba(0,0,0,.12);
   min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
 }
 
 .kpi-label{
@@ -212,15 +217,18 @@
   font-weight:700;
   color:var(--muted);
   letter-spacing:.2px;
+  flex:0 0 auto;
 }
 
 .kpi-value{
   font-size:clamp(18px, 3.2vw, 22px);
   font-weight:800;
-  line-height:1.15;
+  line-height:1.1;
   letter-spacing:-0.01em;
   overflow-wrap:anywhere;
   word-break:break-word;
+  text-align:right;
+  margin-left:auto;
 }
 
 /* =========================================================
@@ -291,6 +299,12 @@
   font-size:12px;
 }
 
+.period-card .badge{
+  padding:5px 9px;
+  font-size:11px;
+  gap:4px;
+}
+
 .badge b{
   font-weight:900;
 }
@@ -348,7 +362,7 @@
 
 .period-card{
   border:1px solid var(--line);
-  border-radius:16px;
+  border-radius:14px;
   overflow:hidden;
   background:rgba(0,0,0,.12);
 }
@@ -356,10 +370,10 @@
 .period-card summary{
   list-style:none;
   cursor:pointer;
-  padding:12px 14px;
+  padding:10px 12px;
   display:flex;
   justify-content:space-between;
-  gap:12px;
+  gap:10px;
   align-items:center;
   user-select:none;
 }
@@ -371,22 +385,24 @@
 .period-meta{
   display:flex;
   flex-direction:column;
-  gap:4px;
+  gap:2px;
 }
 
 .period-range{
   font-weight:900;
-  font-size:14px;
+  font-size:13px;
+  line-height:1.2;
 }
 
 .period-mini{
-  font-size:12px;
+  font-size:11px;
   color:var(--muted);
+  line-height:1.15;
 }
 
 .period-sum{
   display:flex;
-  gap:10px;
+  gap:6px;
   flex-wrap:wrap;
   justify-content:flex-end;
 }
