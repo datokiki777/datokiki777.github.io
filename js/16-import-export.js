@@ -38,7 +38,7 @@ async function handleExportJson() {
     data: appState,
   };
 
-  downloadJson(`client-totals-ALL-groups_${nowStamp()}.json`, payload);
+  downloadJson(`Totals_ALL_${new Date().toISOString().slice(0, 10)}.json`, payload);
 
   // Clear backup reminder dirty flag in IndexedDB
   try {
@@ -337,7 +337,7 @@ function exportPdfAllGroups() {
     if (gi !== groupsData.length - 1) addPageIfNeeded(20);
   });
 
-  const fileName = `client-totals_ALL_${nowStamp()}.pdf`;
+  const fileName = `Totals_ALL_${new Date().toISOString().slice(0, 10)}.pdf`;
 
   setTimeout(() => {
     try {
@@ -480,7 +480,7 @@ async function handleExportExcel() {
     XLSX.utils.book_append_sheet(wb, wsRows, "Rows");
     XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
 
-    const fileName = `client-totals_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    const fileName = `Totals_ALL_${new Date().toISOString().slice(0, 10)}.xlsx`;
     XLSX.writeFile(wb, fileName);
     await askConfirm(
       "Excel exported successfully.",
