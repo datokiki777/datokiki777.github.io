@@ -120,8 +120,14 @@ async function handleImportJsonChange(e) {
       const summary = mergeAppState(incoming);
 
       await saveState();
-      render();
-      if (appState.uiMode === "review") renderReview();
+
+      if (appState.uiMode === "edit") {
+  render();
+      } else {
+  renderReview();
+}
+
+      await refreshFullUiState(); // 🔥 მთავარი ფიქსი
 
       await askConfirm(
         "JSON file merged successfully.\n\n" +
@@ -147,8 +153,13 @@ async function handleImportJsonChange(e) {
     appState = normalizeAppState(normalizeImportedMoneyEverywhere(incoming));
     cleanupDefaultGroup();
     await saveState();
+
+    if (appState.uiMode === "edit") {
     render();
-    if (appState.uiMode === "review") renderReview();
+    } else {
+     renderReview();
+    }
+    await refreshFullUiState(); // 🔥 აქაც
 
     await askConfirm(
       "JSON file imported successfully.",
@@ -781,8 +792,12 @@ async function handleImportExcelChange(e) {
     });
 
     await saveState();
-    render();
-    if (appState.uiMode === "review") renderReview();
+    if (appState.uiMode === "edit") {
+  render();
+    } else {
+     renderReview();
+    }
+    await refreshFullUiState();
 
     if (rateConflicts.length) {
       await askConfirm(
