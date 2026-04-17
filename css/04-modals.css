@@ -99,6 +99,11 @@
   font-weight:800;
 }
 
+.backup-status-pending{
+  color:#3b82f6;
+  font-weight:800;
+}
+
 /* Data & Backup info rows */
 .backup-info-list{
   display:flex;
@@ -162,19 +167,50 @@
 
 /* Data & Backup action buttons */
 .backup-actions-card{
-  overflow:hidden;
+  overflow:visible;
 }
 
 .backup-actions-grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  align-items:center;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+  align-items:stretch;
+  width:100%;
 }
 
 .backup-actions-grid .btn{
   width:100%;
+  height:48px;
+  padding:0 10px;
   justify-content:center;
+  text-align:center;
+  white-space:nowrap;
+  font-size:14px;
+  font-weight:600;
+  border-radius:12px;
+}
+
+.backup-actions-card .backup-actions-grid{
+  max-width:none;
+}
+
+.backup-actions-card{
+  width:100%;
+}
+
+.backup-cloud-note{
+  margin-top:12px;
+  font-size:12px;
+  line-height:1.35;
+  text-align:center;
+  color:var(--muted);
+}
+
+@media (max-width: 520px){
+  .backup-actions-grid .btn{
+    height:44px;
+    font-size:13px;
+  }
 }
 
 /* Top menu Data & Backup button */
@@ -255,25 +291,6 @@
   overflow:hidden;
 }
 
-/* Data & Backup action buttons */
-.backup-actions-card{
-  overflow:hidden;
-}
-
-.backup-actions-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  align-items:center;
-  max-width:540px;
-  margin:0 auto;
-}
-
-.backup-actions-grid .btn{
-  width:100%;
-  justify-content:center;
-}
-
 /* Status colors */
 .backup-status-safe{
   color:#2fb36c;
@@ -288,4 +305,25 @@
 .backup-status-none{
   color:#d9534f;
   font-weight:800;
+}
+
+.backup-cloud-note{
+  margin-top:10px;
+  font-size:12px;
+  line-height:1.35;
+  color:var(--muted);
+  text-align:center;
+}
+
+.backup-action-btn{
+  font-weight:700;
+  letter-spacing:-0.01em;
+}
+
+.cloud-action-btn{
+  font-weight:800;
+}
+
+.backup-actions-grid{
+  gap:8px;
 }

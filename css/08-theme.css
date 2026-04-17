@@ -913,3 +913,7 @@ html[data-theme="light"] .backup-info-right.backup-status-old{
 html[data-theme="light"] .backup-info-right.backup-status-none{
   color:#d9534f;
 }
+
+html[data-theme="light"] .backup-status-pending{
+  color:#1d4ed8;
+}
