@@ -327,3 +327,30 @@
 .backup-actions-grid{
   gap:8px;
 }
+
+/* ===== Restore Source Cards ===== */
+
+.restore-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.restore-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.restore-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.restore-item.active {
+  background: rgba(93,212,255,0.20);
+  border: 1px solid rgba(93,212,255,0.45);
+}

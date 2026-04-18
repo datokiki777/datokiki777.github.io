@@ -917,3 +917,16 @@ html[data-theme="light"] .backup-info-right.backup-status-none{
 html[data-theme="light"] .backup-status-pending{
   color:#1d4ed8;
 }
+
+/* Restore Source - Light Theme */
+
+html[data-theme="light"] .restore-item {
+  background: rgba(255,255,255,0.70);
+  border: 1px solid rgba(15,23,42,0.14);
+  color: #0f172a;
+}
+
+html[data-theme="light"] .restore-item.active {
+  background: rgba(93,212,255,0.25);
+  border-color: rgba(93,212,255,0.50);
+}
