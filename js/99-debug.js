@@ -1,6 +1,14 @@
 // 99-debug.js
 // Pro Debug / Validation System
 
+const debugConfig = window.APP_CONFIG || {};
+const DEBUG_DB_NAME =
+  typeof DB_NAME !== "undefined" ? DB_NAME : debugConfig.DB_NAME || "client_totals_db";
+const DEBUG_DB_VERSION =
+  typeof DB_VERSION !== "undefined" ? DB_VERSION : debugConfig.DB_VERSION || 1;
+const DEBUG_DB_STORE_MAIN =
+  typeof DB_STORE_MAIN !== "undefined" ? DB_STORE_MAIN : debugConfig.DB_STORE_MAIN || "app_store";
+
 /* =========================
    Debug Helpers
 ========================= */
@@ -39,18 +47,18 @@ function debugCheckStorage() {
   console.group("🔍 STORAGE CHECK");
 
   // Check IndexedDB
-  const request = indexedDB.open(DB_NAME, DB_VERSION);
+  const request = indexedDB.open(DEBUG_DB_NAME, DEBUG_DB_VERSION);
   request.onerror = () => {
     console.error("❌ Failed to open IndexedDB");
   };
   request.onsuccess = () => {
     const db = request.result;
-    const tx = db.transaction([DB_STORE_MAIN], "readonly");
-    const store = tx.objectStore(DB_STORE_MAIN);
+    const tx = db.transaction([DEBUG_DB_STORE_MAIN], "readonly");
+    const store = tx.objectStore(DEBUG_DB_STORE_MAIN);
     const getAllKeys = store.getAllKeys();
     getAllKeys.onsuccess = () => {
       const keys = getAllKeys.result;
-      console.log(`📦 IndexedDB (${DB_NAME}) contains ${keys.length} keys:`);
+      console.log(`📦 IndexedDB (${DEBUG_DB_NAME}) contains ${keys.length} keys:`);
       keys.forEach(k => console.log(`   - ${k}`));
     };
     getAllKeys.onerror = () => {

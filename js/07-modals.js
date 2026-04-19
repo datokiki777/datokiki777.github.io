@@ -2,6 +2,12 @@
 // Modal, popup, top menu and pin lock functions
 // UPDATED: IndexedDB support for PIN and backup reminder
 
+const modalsConfig = window.APP_CONFIG || {};
+const BACKUP_REMINDER_LAST_SHOWN_KEY =
+  typeof DB_KEY_BACKUP_REMINDER_LAST_SHOWN !== "undefined"
+    ? DB_KEY_BACKUP_REMINDER_LAST_SHOWN
+    : modalsConfig.DB_KEY_BACKUP_REMINDER_LAST_SHOWN || "backupReminderLastShownWeek";
+
 /* =========================
    Pin Lock Functions (Async)
 ========================= */
@@ -564,7 +570,7 @@ async function showBackupReminderPopup() {
     }
   ).then(async () => {
     try {
-      await dbSet(DB_KEY_BACKUP_REMINDER_LAST_SHOWN, getWeekKeyForReminder(new Date()));
+      await dbSet(BACKUP_REMINDER_LAST_SHOWN_KEY, getWeekKeyForReminder(new Date()));
     } catch (error) {
       console.error("Failed to save backup reminder last shown:", error);
     }

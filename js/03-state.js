@@ -115,7 +115,7 @@ function activeGroup() {
   const firstInWorkspace = state.groups.find((g) =>
     state.workspaceMode === "archive" ? g.archived === true : g.archived !== true
   );
-  return firstInWorkspace || state.groups[0] || null;
+  return firstInWorkspace || null;
 }
 
 function getGroupsByMode(mode = null) {

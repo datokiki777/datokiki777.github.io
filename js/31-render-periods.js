@@ -38,6 +38,27 @@ async function render() {
   updateControlsButtonLabel();
 
   const g = activeGroup();
+  if (!g?.data) {
+    if (defaultRateInput) defaultRateInput.value = "";
+    if (elPeriods) {
+      const emptyLabel =
+        appState.workspaceMode === "archive"
+          ? "No archived group selected"
+          : "No active group selected";
+      elPeriods.innerHTML = `
+        <section class="period period-empty-state">
+          <div class="period-top">
+            <div class="period-title-wrap">
+              <div class="period-title">${emptyLabel}</div>
+              <div class="period-subtitle">Switch workspace or create a group to continue.</div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+    recalcAndRenderTotals();
+    return;
+  }
   const st = g.data;
 
   if (defaultRateInput) defaultRateInput.value = String(st.defaultRatePercent);

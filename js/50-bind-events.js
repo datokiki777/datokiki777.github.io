@@ -59,6 +59,7 @@ totalsAllBtn?.addEventListener("click", async () => {
    Group Picker Modal
 ========================= */
 
+// Topbar group trigger: opens the picker/actions modal for groups.
 groupPickerBtn?.addEventListener("click", () => {
   openGroupPickerModal();
 });
@@ -109,6 +110,7 @@ archiveGroupBtn?.addEventListener("click", async () => {
 
 defaultRateInput?.addEventListener("input", async () => {
   const g = activeGroup();
+  if (!g?.data) return;
   g.data.defaultRatePercent = clampRate(defaultRateInput.value);
   await saveState();
   await updateAfterGlobalChange();
@@ -121,6 +123,7 @@ defaultRateInput?.addEventListener("input", async () => {
 
 addPeriodBtn?.addEventListener("click", async () => {
   const g = activeGroup();
+  if (!g?.data) return;
   const st = g.data;
 
   for (const periodItem of st.periods) {
@@ -170,6 +173,7 @@ addPeriodBtn?.addEventListener("click", async () => {
 
 resetBtn?.addEventListener("click", async () => {
   const g = activeGroup();
+  if (!g?.data) return;
   const ok = await askConfirm(
     `Reset group "${g.name}"? This will clear all its data.`,
     "Reset group",

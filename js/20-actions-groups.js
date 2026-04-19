@@ -48,6 +48,7 @@ async function addGroup() {
 
 async function renameGroup() {
   const g = activeGroup();
+  if (!g) return;
 
   const name = await askText(
     "Rename Group",
@@ -71,6 +72,7 @@ async function renameGroup() {
 
 async function deleteGroup() {
   const g = activeGroup();
+  if (!g) return;
   const ok = await askConfirm(
     `Delete group "${g.name}"?`,
     "Delete group",

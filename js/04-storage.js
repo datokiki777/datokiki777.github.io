@@ -6,14 +6,37 @@
 ========================= */
 
 let dbInstance = null;
+const storageConfig = window.APP_CONFIG || {};
+const STORAGE_DB_NAME =
+  typeof DB_NAME !== "undefined" ? DB_NAME : storageConfig.DB_NAME || "client_totals_db";
+const STORAGE_DB_VERSION =
+  typeof DB_VERSION !== "undefined" ? DB_VERSION : storageConfig.DB_VERSION || 1;
+const STORAGE_DB_STORE_MAIN =
+  typeof DB_STORE_MAIN !== "undefined" ? DB_STORE_MAIN : storageConfig.DB_STORE_MAIN || "app_store";
+const STORAGE_KEY_APP_STATE =
+  typeof DB_KEY_APP_STATE !== "undefined" ? DB_KEY_APP_STATE : storageConfig.DB_KEY_APP_STATE || "appState";
+const STORAGE_KEY_SUMMARY_COLLAPSED =
+  typeof DB_KEY_SUMMARY_COLLAPSED !== "undefined" ? DB_KEY_SUMMARY_COLLAPSED : storageConfig.DB_KEY_SUMMARY_COLLAPSED || "summaryCollapsed";
+const STORAGE_KEY_MONTH_CURSOR =
+  typeof DB_KEY_MONTH_CURSOR !== "undefined" ? DB_KEY_MONTH_CURSOR : storageConfig.DB_KEY_MONTH_CURSOR || "monthCursor";
+const STORAGE_KEY_COLLAPSED_PERIODS =
+  typeof DB_KEY_COLLAPSED_PERIODS !== "undefined" ? DB_KEY_COLLAPSED_PERIODS : storageConfig.DB_KEY_COLLAPSED_PERIODS || "collapsedPeriods";
+const STORAGE_KEY_BACKUP_REMINDER_DIRTY =
+  typeof DB_KEY_BACKUP_REMINDER_DIRTY !== "undefined" ? DB_KEY_BACKUP_REMINDER_DIRTY : storageConfig.DB_KEY_BACKUP_REMINDER_DIRTY || "backupReminderDirty";
+const STORAGE_KEY_BACKUP_REMINDER_LAST_CHANGE =
+  typeof DB_KEY_BACKUP_REMINDER_LAST_CHANGE !== "undefined" ? DB_KEY_BACKUP_REMINDER_LAST_CHANGE : storageConfig.DB_KEY_BACKUP_REMINDER_LAST_CHANGE || "backupReminderLastChange";
+const STORAGE_KEY_BACKUP_REMINDER_LAST_SHOWN =
+  typeof DB_KEY_BACKUP_REMINDER_LAST_SHOWN !== "undefined" ? DB_KEY_BACKUP_REMINDER_LAST_SHOWN : storageConfig.DB_KEY_BACKUP_REMINDER_LAST_SHOWN || "backupReminderLastShownWeek";
+const STORAGE_KEY_PIN_VERIFIED =
+  typeof DB_KEY_PIN_VERIFIED !== "undefined" ? DB_KEY_PIN_VERIFIED : storageConfig.DB_KEY_PIN_VERIFIED || "pinVerified";
 
 function openDb() {
   return new Promise((resolve, reject) => {
-    if (dbInstance && dbInstance.name === DB_NAME) {
+    if (dbInstance && dbInstance.name === STORAGE_DB_NAME) {
       return resolve(dbInstance);
     }
 
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    const request = indexedDB.open(STORAGE_DB_NAME, STORAGE_DB_VERSION);
 
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
@@ -23,8 +46,8 @@ function openDb() {
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
-      if (!db.objectStoreNames.contains(DB_STORE_MAIN)) {
-        db.createObjectStore(DB_STORE_MAIN);
+      if (!db.objectStoreNames.contains(STORAGE_DB_STORE_MAIN)) {
+        db.createObjectStore(STORAGE_DB_STORE_MAIN);
       }
     };
   });
@@ -33,8 +56,8 @@ function openDb() {
 async function dbGet(key) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction([DB_STORE_MAIN], "readonly");
-    const store = tx.objectStore(DB_STORE_MAIN);
+    const tx = db.transaction([STORAGE_DB_STORE_MAIN], "readonly");
+    const store = tx.objectStore(STORAGE_DB_STORE_MAIN);
     const request = store.get(key);
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
@@ -44,8 +67,8 @@ async function dbGet(key) {
 async function dbSet(key, value) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction([DB_STORE_MAIN], "readwrite");
-    const store = tx.objectStore(DB_STORE_MAIN);
+    const tx = db.transaction([STORAGE_DB_STORE_MAIN], "readwrite");
+    const store = tx.objectStore(STORAGE_DB_STORE_MAIN);
     const request = store.put(value, key);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
@@ -55,8 +78,8 @@ async function dbSet(key, value) {
 async function dbDelete(key) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction([DB_STORE_MAIN], "readwrite");
-    const store = tx.objectStore(DB_STORE_MAIN);
+    const tx = db.transaction([STORAGE_DB_STORE_MAIN], "readwrite");
+    const store = tx.objectStore(STORAGE_DB_STORE_MAIN);
     const request = store.delete(key);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
@@ -70,7 +93,7 @@ async function dbDelete(key) {
 async function saveState(options = {}) {
   try {
     if (appState) {
-      await dbSet(DB_KEY_APP_STATE, appState);
+      await dbSet(STORAGE_KEY_APP_STATE, appState);
     }
 
     if (!options.skipBackupReminderDirty) {
@@ -90,7 +113,7 @@ async function saveState(options = {}) {
 
 async function loadState() {
   try {
-    const state = await dbGet(DB_KEY_APP_STATE);
+    const state = await dbGet(STORAGE_KEY_APP_STATE);
     if (!state) return defaultAppState();
     return normalizeAppState(state);
   } catch (error) {
@@ -105,7 +128,7 @@ async function loadState() {
 
 async function getSavedSummaryCollapsed() {
   try {
-    const value = await dbGet(DB_KEY_SUMMARY_COLLAPSED);
+    const value = await dbGet(STORAGE_KEY_SUMMARY_COLLAPSED);
     return value === true;
   } catch {
     return false;
@@ -115,7 +138,7 @@ async function getSavedSummaryCollapsed() {
 async function setSummaryCollapsed(v) {
   rootEl.classList.toggle("summary-collapsed", !!v);
   try {
-    await dbSet(DB_KEY_SUMMARY_COLLAPSED, !!v);
+    await dbSet(STORAGE_KEY_SUMMARY_COLLAPSED, !!v);
   } catch (error) {
     console.error("Failed to set summary collapsed:", error);
   }
@@ -127,7 +150,7 @@ async function setSummaryCollapsed(v) {
 
 async function getSavedMonthCursor() {
   try {
-    const value = await dbGet(DB_KEY_MONTH_CURSOR);
+    const value = await dbGet(STORAGE_KEY_MONTH_CURSOR);
     return value || "";
   } catch {
     return "";
@@ -136,7 +159,7 @@ async function getSavedMonthCursor() {
 
 async function setSavedMonthCursor(v) {
   try {
-    await dbSet(DB_KEY_MONTH_CURSOR, v || "");
+    await dbSet(STORAGE_KEY_MONTH_CURSOR, v || "");
   } catch (error) {
     console.error("Failed to set month cursor:", error);
   }
@@ -148,8 +171,8 @@ async function setSavedMonthCursor(v) {
 
 async function markBackupReminderDirty() {
   try {
-    await dbSet(DB_KEY_BACKUP_REMINDER_DIRTY, true);
-    await dbSet(DB_KEY_BACKUP_REMINDER_LAST_CHANGE, String(Date.now()));
+    await dbSet(STORAGE_KEY_BACKUP_REMINDER_DIRTY, true);
+    await dbSet(STORAGE_KEY_BACKUP_REMINDER_LAST_CHANGE, String(Date.now()));
   } catch (error) {
     console.error("Failed to mark backup reminder dirty:", error);
   }
@@ -182,16 +205,16 @@ function isBackupReminderWindow(date = new Date()) {
 
 async function shouldShowBackupReminder(now = new Date()) {
   try {
-    const dirty = await dbGet(DB_KEY_BACKUP_REMINDER_DIRTY);
+    const dirty = await dbGet(STORAGE_KEY_BACKUP_REMINDER_DIRTY);
     if (!dirty) return false;
     if (!isBackupReminderWindow(now)) return false;
 
     const currentWeekKey = getWeekKeyForReminder(now);
-    const lastShownWeekKey = await dbGet(DB_KEY_BACKUP_REMINDER_LAST_SHOWN) || "";
+    const lastShownWeekKey = await dbGet(STORAGE_KEY_BACKUP_REMINDER_LAST_SHOWN) || "";
 
     if (lastShownWeekKey === currentWeekKey) return false;
 
-    const lastChangeRaw = await dbGet(DB_KEY_BACKUP_REMINDER_LAST_CHANGE);
+    const lastChangeRaw = await dbGet(STORAGE_KEY_BACKUP_REMINDER_LAST_CHANGE);
     if (!lastChangeRaw) return false;
 
     const lastChange = new Date(Number(lastChangeRaw));
@@ -216,7 +239,7 @@ async function getSavedCollapsedPeriods() {
   }
 
   try {
-    collapsedPeriodsCache = await dbGet(DB_KEY_COLLAPSED_PERIODS) || {};
+    collapsedPeriodsCache = await dbGet(STORAGE_KEY_COLLAPSED_PERIODS) || {};
   } catch {
     collapsedPeriodsCache = {};
   }
@@ -227,7 +250,7 @@ async function getSavedCollapsedPeriods() {
 async function saveCollapsedPeriods(map) {
   collapsedPeriodsCache = map || {};
   try {
-    await dbSet(DB_KEY_COLLAPSED_PERIODS, collapsedPeriodsCache);
+    await dbSet(STORAGE_KEY_COLLAPSED_PERIODS, collapsedPeriodsCache);
   } catch (error) {
     console.error("Failed to save collapsed periods:", error);
   }
@@ -250,7 +273,7 @@ async function setPeriodCollapsed(periodId, collapsed) {
 
 async function isDeviceVerified() {
   try {
-    const value = await dbGet(DB_KEY_PIN_VERIFIED);
+    const value = await dbGet(STORAGE_KEY_PIN_VERIFIED);
     return value === true;
   } catch {
     return false;
@@ -259,7 +282,7 @@ async function isDeviceVerified() {
 
 async function setDeviceVerified(v) {
   try {
-    await dbSet(DB_KEY_PIN_VERIFIED, !!v);
+    await dbSet(STORAGE_KEY_PIN_VERIFIED, !!v);
   } catch (error) {
     console.error("Failed to set device verified:", error);
   }

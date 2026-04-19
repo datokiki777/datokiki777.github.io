@@ -5,6 +5,7 @@ function renderEditPeriodTotals(periodId = null) {
   if (appState.uiMode !== "edit") return;
 
   const g = activeGroup();
+  if (!g?.data) return;
   const st = g.data;
   const periodSections = elPeriods?.querySelectorAll?.(".period") ?? [];
 
@@ -40,7 +41,8 @@ async function updateAfterPeriodMetaChange(periodId) {
   const periodSection = document.querySelector(`.period[data-period-id="${periodId}"]`);
   if (periodSection) {
     const collapseMeta = periodSection.querySelector(".period-range-preview");
-    const p = activeGroup().data.periods.find(x => x.id === periodId);
+    const group = activeGroup();
+    const p = group?.data?.periods?.find(x => x.id === periodId);
     if (collapseMeta && p) {
       collapseMeta.textContent = formatPeriodPreview(p.from, p.to);
     }

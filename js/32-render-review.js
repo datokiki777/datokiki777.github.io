@@ -18,7 +18,7 @@ function renderReview() {
             : "👥 No active groups");
 
     reviewView.innerHTML = `
-      <div class="review-card" style="text-align:center; padding:50px 20px;">
+      <div class="review-card review-empty-card" style="text-align:center; padding:50px 20px;">
         <div style="font-size:64px; margin-bottom:20px; opacity:0.6;">📭</div>
         <div style="font-size:20px; font-weight:500; opacity:0.8;">${emptyMessage}</div>
         <div style="font-size:14px; margin-top:12px; opacity:0.5;">Create a group or add periods to get started</div>
@@ -81,14 +81,14 @@ function renderReview() {
 
           return `
             <div class="client-item">
-              <div>
+              <div class="client-item-main">
                 <div class="client-name-row">
                   <div class="client-name">${g.archived ? '📦 ' : ''}${escapeHtml(name)}</div>
                   ${statusHtml}
                 </div>
-                <div class="review-sub" style="margin:2px 0 0 0;">City: <b>${escapeHtml(city)}</b></div>
+                <div class="review-sub client-city" style="margin:2px 0 0 0;">City: <b>${escapeHtml(city)}</b></div>
               </div>
-              <div class="client-values">
+              <div class="client-values client-finance">
                 <span>Gross:</span> <b>${fmt(parseMoney(r.gross))}</b>
                 <span>Net:</span> <b>${fmt(parseMoney(r.net))}</b>
               </div>
@@ -98,7 +98,7 @@ function renderReview() {
 
         periodsHtml += `
           <details class="period-card ${colorClass}">
-            <summary>
+            <summary class="period-card-header">
               <div class="period-meta">
                 <div class="period-range">${escapeHtml(from)} → ${escapeHtml(to)}</div>
                 <div class="period-mini">${p.rows.length} clients</div>
@@ -122,17 +122,17 @@ function renderReview() {
     }
 
     fullHtml += `
-      <section class="review-card ${colorClass} ${collapsed ? "is-collapsed" : "is-expanded"}" style="${g.archived ? 'opacity:0.7;' : ''}">
+      <section class="review-card review-group-card ${colorClass} ${collapsed ? "is-collapsed" : "is-expanded"}" style="${g.archived ? 'opacity:0.7;' : ''}">
         <button
           type="button"
           class="review-group-toggle"
           data-review-group-toggle="${g.id}"
           aria-expanded="${collapsed ? "false" : "true"}"
         >
-          <div class="review-head review-head-collapsible">
+          <div class="review-head review-head-collapsible review-card-header">
             <div class="review-head-main">
               <h3 class="review-title">${escapeHtml(g.name)}${g.archived ? ' 📦' : ''}</h3>
-              <div class="review-sub">${groupTotals.periods} periods • ${groupTotals.clients} rows • Default ${fmt(st.defaultRatePercent)}%</div>
+              <div class="review-sub review-group-meta">${groupTotals.periods} periods • ${groupTotals.clients} rows • Default ${fmt(st.defaultRatePercent)}%</div>
             </div>
 
             <div class="review-head-side">
@@ -147,16 +147,16 @@ function renderReview() {
 
         ${collapsed ? "" : `
           <div class="review-group-body">
-            <div class="review-kpis">
-              <div class="kpi">
+            <div class="review-kpis review-kpis-premium">
+              <div class="kpi kpi-main kpi-gross">
                 <div class="kpi-label">Gross</div>
                 <div class="kpi-value">${fmt(groupTotals.gross)}</div>
               </div>
-              <div class="kpi">
+              <div class="kpi kpi-main kpi-net">
                 <div class="kpi-label">Net</div>
                 <div class="kpi-value">${fmt(groupTotals.net)}</div>
               </div>
-              <div class="kpi">
+              <div class="kpi kpi-main kpi-my">
                 <div class="kpi-label">My €</div>
                 <div class="kpi-value">${fmt(groupTotals.my)}</div>
               </div>

@@ -6,6 +6,52 @@
 ========================= */
 
 let appInitialized = false;
+const appChromeBoot = {
+  theme: false,
+  controls: false,
+  workspace: false,
+  summary: false,
+  menu: false,
+  pin: false,
+  status: false
+};
+
+async function ensureAppChromeInitialized() {
+  if (!appChromeBoot.theme) {
+    await initThemeAsync();
+    appChromeBoot.theme = true;
+  }
+
+  if (!appChromeBoot.controls) {
+    await initControlsToggleAsync();
+    appChromeBoot.controls = true;
+  }
+
+  if (!appChromeBoot.workspace) {
+    initWorkspaceSwitch();
+    appChromeBoot.workspace = true;
+  }
+
+  if (!appChromeBoot.summary) {
+    initSummaryPanel();
+    appChromeBoot.summary = true;
+  }
+
+  if (!appChromeBoot.menu) {
+    initTopMenu();
+    appChromeBoot.menu = true;
+  }
+
+  if (!appChromeBoot.pin) {
+    await initPinLockAsync();
+    appChromeBoot.pin = true;
+  }
+
+  if (!appChromeBoot.status) {
+    initStatusBadgeActions();
+    appChromeBoot.status = true;
+  }
+}
 
 /* =========================
    Async App Initialization
@@ -19,26 +65,8 @@ async function initApp() {
     // 2. Load app state from IndexedDB
     appState = await loadState();
 
-    // 3. Initialize theme (async)
-    await initThemeAsync();
-
-    // 4. Initialize controls toggle (async)
-    await initControlsToggleAsync();
-
-    // 5. Initialize workspace switch
-    initWorkspaceSwitch();
-
-    // 6. Initialize summary panel
-    initSummaryPanel();
-
-    // 7. Initialize top menu
-    initTopMenu();
-
-    // 8. Initialize PIN lock
-    await initPinLockAsync();
-
-    // 9. Initialize status badge actions
-    initStatusBadgeActions();
+    // 3. Initialize UI chrome/hooks
+    await ensureAppChromeInitialized();
 
     // 10. Set UI mode
     await setMode(appState.uiMode || "review");
@@ -60,7 +88,12 @@ async function initApp() {
 
   } catch (error) {
     console.error("App initialization failed:", error);
-    appState = defaultAppState();
+    appState = appState && Array.isArray(appState.groups) ? appState : defaultAppState();
+    try {
+      await ensureAppChromeInitialized();
+    } catch (initError) {
+      console.error("Fallback UI initialization failed:", initError);
+    }
     await setMode(appState.uiMode || "review");
   }
 

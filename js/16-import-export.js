@@ -2,6 +2,12 @@
 // JSON, Excel and PDF export/import functions
 // UPDATED: IndexedDB support, removed localStorage storage indicator
 
+const importExportConfig = window.APP_CONFIG || {};
+const BACKUP_REMINDER_DIRTY_KEY =
+  typeof DB_KEY_BACKUP_REMINDER_DIRTY !== "undefined"
+    ? DB_KEY_BACKUP_REMINDER_DIRTY
+    : importExportConfig.DB_KEY_BACKUP_REMINDER_DIRTY || "backupReminderDirty";
+
 /* =========================
    File Helpers
 ========================= */
@@ -42,7 +48,7 @@ async function handleExportJson() {
 
   // Clear backup reminder dirty flag in IndexedDB
   try {
-    await dbSet(DB_KEY_BACKUP_REMINDER_DIRTY, false);
+    await dbSet(BACKUP_REMINDER_DIRTY_KEY, false);
   } catch (error) {
     console.error("Failed to clear backup reminder flag:", error);
   }
@@ -791,10 +797,16 @@ async function handleImportExcelChange(e) {
 
     if (!okReplace) return;
 
+    const firstActiveImported = importedGroups.find((g) => g.archived !== true) || null;
+    const firstArchivedImported = importedGroups.find((g) => g.archived === true) || null;
+    const nextWorkspaceMode = firstActiveImported ? "active" : "archive";
+    const nextActiveGroupId =
+      (nextWorkspaceMode === "active" ? firstActiveImported?.id : firstArchivedImported?.id) || "";
+
     appState = normalizeAppState({
-      activeGroupId: importedGroups[0]?.id || "",
+      activeGroupId: nextActiveGroupId,
       groups: importedGroups,
-      workspaceMode: "active",
+      workspaceMode: nextWorkspaceMode,
       grandMode: "all",
       uiMode: appState.uiMode === "edit" ? "edit" : "review"
     });

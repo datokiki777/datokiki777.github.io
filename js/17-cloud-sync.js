@@ -26,7 +26,14 @@ function toDayKey(date = new Date()) {
 function toDisplayDay(dayKey) {
   const [y, m, d] = String(dayKey || "").split("-");
   if (!y || !m || !d) return dayKey || "";
-  return `${d}-${m}-${y}`;
+  return `${d}/${m}/${y}`;
+}
+
+function formatCloudSnapshotDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return formatDateForRange(date);
 }
 
 async function getCloudRefs() {
@@ -294,9 +301,10 @@ async function chooseCloudRestoreSource() {
 
   if (mainDoc.exists) {
     const mainData = mainDoc.data() || {};
+    const latestDate = formatCloudSnapshotDate(mainData.updatedAt);
     options.push({
       id: "latest",
-      label: `Latest Cloud${mainData.updatedAt ? " - " + new Date(mainData.updatedAt).toLocaleString() : ""}`,
+      label: `Latest Cloud${latestDate ? " - " + latestDate : ""}`,
       payload: mainData
     });
   }
@@ -423,12 +431,37 @@ async function handleCloudLoad() {
     );
     if (!confirmLoad) return;
 
-    appState = normalizeAppState(restoreData);
+    const currentUiMode = appState?.uiMode === "edit" ? "edit" : "review";
+    const currentWorkspaceMode =
+      appState?.workspaceMode === "archive" ? "archive" : "active";
+    const currentGrandMode = appState?.grandMode === "all" ? "all" : "active";
+    const currentLastReviewGrandMode =
+      appState?.lastReviewGrandMode === "all" ? "all" : "active";
+
+    appState = normalizeAppState({
+      ...restoreData,
+      uiMode: currentUiMode,
+      workspaceMode: currentWorkspaceMode,
+      grandMode: currentUiMode === "edit" ? "active" : currentGrandMode,
+      lastReviewGrandMode:
+        currentUiMode === "review" ? currentGrandMode : currentLastReviewGrandMode
+    });
     cleanupDefaultGroup();
 
     await saveState({ skipCloudAutoSync: true });
     cloudHasPendingChanges = false;
     cloudLastError = "";
+
+    if (editView && reviewView) {
+      const isEdit = appState.uiMode === "edit";
+      editView.hidden = !isEdit;
+      reviewView.hidden = isEdit;
+      if (isEdit) {
+        reviewView.innerHTML = "";
+      }
+    }
+
+    await refreshFullUiState();
 
     if (appState.uiMode === "edit") {
       render();
@@ -436,7 +469,6 @@ async function handleCloudLoad() {
       renderReview();
     }
 
-    await refreshFullUiState();
     setCloudSyncStatus(
       "synced",
       payload?.updatedAt || payload?.savedAt || new Date().toISOString()

@@ -1,8 +1,16 @@
 // 15-theme.js
 // Theme, UI mode, workspace, collapse functions (full)
 
+const themeConfig = window.APP_CONFIG || {};
+const THEME_KEY =
+  typeof DB_KEY_THEME !== "undefined" ? DB_KEY_THEME : themeConfig.DB_KEY_THEME || "theme";
+const CONTROLS_COLLAPSED_KEY =
+  typeof DB_KEY_CONTROLS_COLLAPSED !== "undefined"
+    ? DB_KEY_CONTROLS_COLLAPSED
+    : themeConfig.DB_KEY_CONTROLS_COLLAPSED || "controlsCollapsed";
+
 async function initThemeAsync() {
-  const saved = (await dbGet(DB_KEY_THEME)) || "dark";
+  const saved = (await dbGet(THEME_KEY)) || "dark";
   document.documentElement.setAttribute("data-theme", saved);
   if (themeSwitch) {
     themeSwitch.checked = saved === "light";
@@ -13,21 +21,21 @@ async function initThemeAsync() {
   document.documentElement.setAttribute("data-theme", next);
 
   // 2. შენახვა ხდება ფონში (არ ველოდებით)
-  dbSet(DB_KEY_THEME, next).catch(console.error);
+  dbSet(THEME_KEY, next).catch(console.error);
 });
   }
 }
 
 async function initControlsToggleAsync() {
   try {
-    const saved = await dbGet(DB_KEY_CONTROLS_COLLAPSED);
+    const saved = await dbGet(CONTROLS_COLLAPSED_KEY);
     if (saved === true) rootEl.classList.add("controls-collapsed");
     else rootEl.classList.remove("controls-collapsed");
   } catch(e) { console.error(e); }
   controlsToggle?.addEventListener("click", async () => {
     const next = !rootEl.classList.contains("controls-collapsed");
     rootEl.classList.toggle("controls-collapsed", next);
-    await dbSet(DB_KEY_CONTROLS_COLLAPSED, next);
+    await dbSet(CONTROLS_COLLAPSED_KEY, next);
   });
 }
 
@@ -71,6 +79,7 @@ async function setWorkspaceMode(mode) {
   const firstInWorkspace = appState.groups.find(g => next === "archive" ? g.archived : !g.archived);
   if (rememberedGroup) appState.activeGroupId = rememberedGroup.id;
   else if (firstInWorkspace) appState.activeGroupId = firstInWorkspace.id;
+  else appState.activeGroupId = "";
   if (appState.uiMode === "edit") appState.grandMode = "active";
   else appState.grandMode = appState.lastReviewGrandMode === "all" ? "all" : "active";
   await saveState();
@@ -93,10 +102,15 @@ function initWorkspaceSwitch() {
 
 function setControlsForMode(mode) {
   const isEdit = mode === "edit";
+  const hasActiveSelection = !!activeGroup();
   if (editActions) editActions.style.display = isEdit ? "flex" : "none";
   if (reviewActions) reviewActions.style.display = isEdit ? "none" : "flex";
   const allBtns = [groupPickerBtn, addGroupBtn, renameGroupBtn, deleteGroupBtn, document.getElementById("archiveGroupBtn"), defaultRateInput, addPeriodBtn, resetBtn, topMenuBtn];
-  allBtns.forEach(btn => { if (btn) btn.disabled = !(isEdit || btn === topMenuBtn || btn === groupPickerBtn); });
+  allBtns.forEach((btn) => {
+    if (!btn) return;
+    const alwaysAllowed = btn === topMenuBtn || btn === groupPickerBtn;
+    btn.disabled = !(alwaysAllowed || (isEdit && hasActiveSelection));
+  });
 }
 
 async function setMode(mode) {
