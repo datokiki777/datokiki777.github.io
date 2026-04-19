@@ -105,13 +105,14 @@
 ========================================================= */
 
 .review-search-input{
-  height:40px;
-  padding:10px 12px;
-  border-radius:14px;
+  height:46px;
+  padding:12px 14px;
+  border-radius:16px;
   border:1px solid var(--line);
-  background:rgba(255,255,255,.06);
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
   color:var(--text);
   outline:none;
+  font-size:14px;
 }
 
 .review-search-input:focus{
