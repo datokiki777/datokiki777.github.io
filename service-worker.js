@@ -29,6 +29,7 @@ const CORE_ASSETS = [
   "./js/14-search.js",
   "./js/15-theme.js",
   "./js/16-import-export.js",
+  "./js/17-cloud-sync.js",
   "./js/20-actions-groups.js",
   "./js/21-actions-periods.js",
   "./js/22-actions-rows.js",
@@ -42,6 +43,7 @@ const CORE_ASSETS = [
   "./js/40-update-flow.js",
   "./js/50-bind-events.js",
   "./js/60-app-init.js",
+  "./js/98-stress-tools.js",
   "./js/99-debug.js",
 
   "./icons/favicon.ico",

@@ -129,7 +129,7 @@
       src="./icons/icon-512.png"
       alt="Client Totals"
        />
-     <p class="startup-subtitle">Groups • Periods •    Review</p>
+     <p class="startup-subtitle">Groups &bull; Periods &bull; Review</p>
     <h1 class="startup-title">Client Totals</h1>
     <div class="startup-glow"></div>
   </div>
@@ -156,13 +156,13 @@
     <button id="modeReviewBtn" class="btn small">Review</button>
   </div>
 
-  <button id="controlsToggle" class="btn small">⚙ Controls</button>
+  <button id="controlsToggle" class="btn small">Controls</button>
 
   <label class="theme-switch" title="Theme">
     <input id="themeSwitch" type="checkbox">
     <span class="slider"></span>
-    <span class="icon moon">🌙</span>
-    <span class="icon sun">☀️</span>
+    <span class="icon moon" aria-hidden="true">&#9790;</span>
+    <span class="icon sun" aria-hidden="true">&#9728;</span>
   </label>
 </div>
 
@@ -176,7 +176,7 @@
           <div class="group-row">
             <button id="groupPickerBtn" class="select-like-btn" type="button">
               <span id="groupPickerBtnText">Select group</span>
-              <span class="select-like-arrow">▾</span>
+              <span class="select-like-arrow">&#9662;</span>
             </button>
 
             <button id="addGroupBtn" class="btn small primary">+ Group</button>
@@ -186,7 +186,7 @@
               <button id="deleteGroupBtn" class="btn small danger">Del</button>
             </div>
 
-            <button id="archiveGroupBtn" class="btn small" title="Archive / Unarchive group">📦</button>
+            <button id="archiveGroupBtn" class="btn small" title="Archive / Unarchive group">Archive</button>
           </div>
         </label>
 
@@ -211,8 +211,8 @@
     <section class="summary card">
   <div class="summary-head">
     <button id="summaryCollapseBtn" class="summary-title-btn" type="button">
-      <span>📊 Overview</span>
-      <span id="summaryCollapseIcon" class="summary-collapse-icon">▾</span>
+      <span>Overview</span>
+      <span id="summaryCollapseIcon" class="summary-collapse-icon">&#9662;</span>
     </button>
 
     <div class="toggle">
@@ -234,7 +234,7 @@
     </div>
 
     <div class="kpi">
-      <div class="kpi-label">My €</div>
+      <div class="kpi-label">My EUR</div>
       <div class="kpi-value" id="grandMy">0.00</div>
     </div>
   </div>
@@ -452,7 +452,7 @@
 </template>
 
   <!-- Scroll to top button (must be inside body) -->
-  <button id="toTopBtn" class="to-top" aria-label="Back to top">↑</button>
+  <button id="toTopBtn" class="to-top" aria-label="Back to top">&#8593;</button>
   <button id="fabAddClient" class="btn primary fab-add-client">+ Add client</button>
   
   <!-- PIN Lock Modal -->
@@ -516,7 +516,7 @@
 
     <!-- Storage -->
     <button id="dataBackupBtn" class="top-menu-item storage-box data-backup-menu-btn" type="button">
-  <span class="data-backup-menu-icon">💾</span>
+  <span class="data-backup-menu-icon" aria-hidden="true">&#128190;</span>
   <span class="data-backup-menu-title">Data & Backup</span>
 </button>
 
@@ -526,51 +526,51 @@
 <div id="dataBackupModal" class="modal-backdrop" style="display:none;">
   <div class="modal">
 
-    <div class="modal-title">💾 Data & Backup</div>
+    <div class="modal-title">Data &amp; Backup</div>
 
     <!-- Information -->
     <div class="card backup-info-card" style="margin-top:10px; padding:14px;">
       <div class="backup-info-list">
 
         <div class="backup-info-row">
-          <div class="backup-info-left">💾 <span>Used Storage</span></div>
+          <div class="backup-info-left"><span>Used Storage</span></div>
           <div class="backup-info-fill"></div>
           <div class="backup-info-right" id="dbStorage">-</div>
         </div>
 
         <div class="backup-info-row">
-          <div class="backup-info-left">🟢 <span>Active</span></div>
+          <div class="backup-info-left"><span>Active</span></div>
           <div class="backup-info-fill"></div>
           <div class="backup-info-right" id="dbActive">-</div>
         </div>
 
         <div class="backup-info-row">
-          <div class="backup-info-left">📦 <span>Archive</span></div>
+          <div class="backup-info-left"><span>Archive</span></div>
           <div class="backup-info-fill"></div>
           <div class="backup-info-right" id="dbArchive">-</div>
         </div>
 
         <div class="backup-info-row">
-          <div class="backup-info-left">🕒 <span>Last Backup</span></div>
+          <div class="backup-info-left"><span>Last Backup</span></div>
           <div class="backup-info-fill"></div>
           <div class="backup-info-right" id="dbLastBackup">-</div>
         </div>
 
         <div class="backup-info-row">
-          <div class="backup-info-left">📁 <span>Backups</span></div>
+          <div class="backup-info-left"><span>Backups</span></div>
           <div class="backup-info-fill"></div>
           <div class="backup-info-right" id="dbCount">-</div>
         </div>
 
         <div class="backup-info-row">
-          <div class="backup-info-left">🛡️ <span>Status</span></div>
+          <div class="backup-info-left"><span>Status</span></div>
           <div class="backup-info-fill"></div>
           <div class="backup-info-right" id="dbStatus">-</div>
         </div>
         
         <div class="backup-info-row">
   <div class="backup-info-left">
-    <span>☁️ Cloud Sync</span>
+    <span>Cloud Sync</span>
   </div>
   <div class="backup-info-fill"></div>
   <div id="dbCloudSyncStatus" class="backup-info-right backup-status-none">—</div>
@@ -579,13 +579,13 @@
       </div>
     </div>
 
-    <!-- 🟩 Actions -->
+    <!-- Actions -->
 <div class="card backup-actions-card" style="margin-top:12px; padding:14px;">
   <div class="backup-actions-grid">
-  <button id="createBackupBtn" class="btn primary backup-action-btn" type="button">💾 Backup</button>
-  <button id="restoreBackupBtn" class="btn backup-action-btn" type="button">♻️ Restore</button>
-  <button id="cloudSaveBtn" class="btn primary backup-action-btn cloud-action-btn" type="button">⛅ Save Cloud</button>
-<button id="cloudLoadBtn" class="btn backup-action-btn cloud-action-btn" type="button">⛅ Load Cloud</button>
+  <button id="createBackupBtn" class="btn primary backup-action-btn" type="button">Backup</button>
+  <button id="restoreBackupBtn" class="btn backup-action-btn" type="button">Restore</button>
+  <button id="cloudSaveBtn" class="btn primary backup-action-btn cloud-action-btn" type="button">Save Cloud</button>
+<button id="cloudLoadBtn" class="btn backup-action-btn cloud-action-btn" type="button">Load Cloud</button>
 </div>
 
   <div class="backup-cloud-note">
@@ -712,10 +712,10 @@
 <script src="js/14-search.js"></script>
 <script src="js/16-import-export.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
+  window.__db = null;
+  window.__firebaseInitError = "";
+
   const firebaseConfig = {
     apiKey: "AIzaSyBQ184qyPArf__1LRKOfyFkwfWB0io2ipM",
     authDomain: "client-totals-sync.firebaseapp.com",
@@ -725,11 +725,63 @@
     appId: "1:69584526058:web:9a06b863e83663476f5593"
   };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+  function loadExternalScript(src) {
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) {
+        if (existing.dataset.loaded === "true") {
+          resolve();
+          return;
+        }
 
-  // global access
-  window.__db = db;
+        existing.addEventListener("load", () => resolve(), { once: true });
+        existing.addEventListener("error", () => reject(new Error(`Failed to load ${src}`)), { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.onload = () => {
+        script.dataset.loaded = "true";
+        resolve();
+      };
+      script.onerror = () => reject(new Error(`Failed to load ${src}`));
+      document.head.appendChild(script);
+    });
+  }
+
+  window.__firebaseReady = (async () => {
+    try {
+      await loadExternalScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+      await loadExternalScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js");
+
+      if (!window.firebase) {
+        throw new Error("Firebase SDK unavailable");
+      }
+
+      if (!firebase.apps?.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+
+      window.__db = firebase.firestore();
+      return true;
+    } catch (error) {
+      window.__firebaseInitError = String(error?.message || error || "Cloud sync unavailable");
+      console.warn("Firebase unavailable, app continues in local-only mode.", error);
+      return false;
+    } finally {
+      if (typeof window.onCloudBackendReady === "function") {
+        try {
+          window.onCloudBackendReady(
+            window.__firebaseInitError ? new Error(window.__firebaseInitError) : null
+          );
+        } catch (callbackError) {
+          console.error("Cloud ready callback failed:", callbackError);
+        }
+      }
+    }
+  })();
 </script>
 
 <script src="js/17-cloud-sync.js"></script>
@@ -746,6 +798,7 @@
 <script src="js/40-update-flow.js"></script>
 <script src="js/50-bind-events.js"></script>
 <script src="js/60-app-init.js"></script>
+<script src="js/98-stress-tools.js"></script>
 <script src="js/99-debug.js"></script>
 
 <script>
