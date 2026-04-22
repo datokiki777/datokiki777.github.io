@@ -4,6 +4,9 @@
 function renderReview() {
   if (appState.uiMode !== "review") return;
   if (!reviewView) return;
+  if (globalSearchCard) {
+  globalSearchCard.hidden = false;
+}
 
   const groupsToShow = getGroupsByMode();
 
