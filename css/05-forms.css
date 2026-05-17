@@ -165,7 +165,7 @@
 .paid-weeks-inline{
   position:absolute;
   right:10px;
-  top:-6px;
+  top:8px;
   z-index:5;
 }
 
