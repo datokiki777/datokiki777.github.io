@@ -1,6 +1,7 @@
-const CACHE = "client-totals-shell-v7.9";
-const RUNTIME_CACHE = "client-totals-runtime-v7.9";
-const CDN_CACHE = "client-totals-cdn-v5.7";
+const CACHE = "client-totals-shell-v8.0";
+const RUNTIME_CACHE = "client-totals-runtime-v8.0";
+const CDN_CACHE = "client-totals-cdn-v8.0";
+
 const CDN_ASSETS = [
   "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
   "https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"
@@ -61,11 +62,29 @@ const CORE_ASSETS = [
   "./icons/icon-1024.png"
 ];
 
+async function cacheCoreAssetsFresh() {
+  const cache = await caches.open(CACHE);
+
+  await Promise.all(
+    CORE_ASSETS.map(async (asset) => {
+      try {
+        const req = new Request(asset, { cache: "reload" });
+        const res = await fetch(req);
+
+        if (res && res.status === 200) {
+          await cache.put(asset, res.clone());
+        }
+      } catch (error) {
+        console.warn("Core asset cache failed:", asset, error);
+      }
+    })
+  );
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
-      const cache = await caches.open(CACHE);
-      await cache.addAll(CORE_ASSETS);
+      await cacheCoreAssetsFresh();
     })()
   );
 });
@@ -74,6 +93,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
+
       await Promise.all(
         keys.map((key) => {
           if (key !== CACHE && key !== RUNTIME_CACHE && key !== CDN_CACHE) {
@@ -81,6 +101,7 @@ self.addEventListener("activate", (event) => {
           }
         })
       );
+
       await self.clients.claim();
     })()
   );
@@ -97,14 +118,16 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       (async () => {
         const cached = await caches.match(req);
+
         if (cached) {
           fetch(req)
             .then(async (res) => {
               if (!res || (res.status !== 200 && res.type !== "opaque")) return;
               const cache = await caches.open(CDN_CACHE);
-              cache.put(req, res.clone());
+              await cache.put(req, res.clone());
             })
             .catch(() => {});
+
           return cached;
         }
 
@@ -112,7 +135,7 @@ self.addEventListener("fetch", (event) => {
           const fresh = await fetch(req);
           if (fresh && (fresh.status === 200 || fresh.type === "opaque")) {
             const cache = await caches.open(CDN_CACHE);
-            cache.put(req, fresh.clone());
+            await cache.put(req, fresh.clone());
           }
           return fresh;
         } catch (error) {
@@ -135,11 +158,13 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       (async () => {
         try {
-          const fresh = await fetch(req);
+          const fresh = await fetch(req, { cache: "reload" });
+
           if (fresh && fresh.status === 200) {
             const cache = await caches.open(CACHE);
-            cache.put(req, fresh.clone());
+            await cache.put(req, fresh.clone());
           }
+
           return fresh;
         } catch (error) {
           return (
@@ -158,28 +183,24 @@ self.addEventListener("fetch", (event) => {
     url.pathname.endsWith(".css");
 
   if (isCodeAsset) {
-  event.respondWith(
-    (async () => {
-      try {
-        // ყოველთვის ახალი JS/CSS წამოიღოს
-        const fresh = await fetch(req, {
-          cache: "no-store"
-        });
+    event.respondWith(
+      (async () => {
+        try {
+          const fresh = await fetch(req, { cache: "reload" });
 
-        if (fresh && fresh.status === 200 && fresh.type === "basic") {
-          const runtime = await caches.open(RUNTIME_CACHE);
-          runtime.put(req, fresh.clone());
+          if (fresh && fresh.status === 200 && fresh.type === "basic") {
+            const runtime = await caches.open(RUNTIME_CACHE);
+            await runtime.put(req, fresh.clone());
+          }
+
+          return fresh;
+        } catch (error) {
+          return caches.match(req);
         }
-
-        return fresh;
-      } catch (error) {
-        return caches.match(req);
-      }
-    })()
-  );
-
-  return;
-}
+      })()
+    );
+    return;
+  }
 
   event.respondWith(
     (async () => {
@@ -190,19 +211,23 @@ self.addEventListener("fetch", (event) => {
           .then(async (res) => {
             if (!res || res.status !== 200 || res.type !== "basic") return;
             const runtime = await caches.open(RUNTIME_CACHE);
-            runtime.put(req, res.clone());
+            await runtime.put(req, res.clone());
           })
           .catch(() => {});
+
         return cached;
       }
 
       try {
         const res = await fetch(req);
+
         if (!res || res.status !== 200 || res.type !== "basic") {
           return res;
         }
+
         const runtime = await caches.open(RUNTIME_CACHE);
-        runtime.put(req, res.clone());
+        await runtime.put(req, res.clone());
+
         return res;
       } catch (error) {
         return caches.match(req);
