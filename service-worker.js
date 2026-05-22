@@ -1,5 +1,5 @@
-const CACHE = "client-totals-shell-v7.8";
-const RUNTIME_CACHE = "client-totals-runtime-v7.8";
+const CACHE = "client-totals-shell-v7.9";
+const RUNTIME_CACHE = "client-totals-runtime-v7.9";
 const CDN_CACHE = "client-totals-cdn-v5.7";
 const CDN_ASSETS = [
   "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
@@ -158,22 +158,28 @@ self.addEventListener("fetch", (event) => {
     url.pathname.endsWith(".css");
 
   if (isCodeAsset) {
-    event.respondWith(
-      (async () => {
-        try {
-          const fresh = await fetch(req);
-          if (fresh && fresh.status === 200 && fresh.type === "basic") {
-            const runtime = await caches.open(RUNTIME_CACHE);
-            runtime.put(req, fresh.clone());
-          }
-          return fresh;
-        } catch (error) {
-          return caches.match(req);
+  event.respondWith(
+    (async () => {
+      try {
+        // ყოველთვის ახალი JS/CSS წამოიღოს
+        const fresh = await fetch(req, {
+          cache: "no-store"
+        });
+
+        if (fresh && fresh.status === 200 && fresh.type === "basic") {
+          const runtime = await caches.open(RUNTIME_CACHE);
+          runtime.put(req, fresh.clone());
         }
-      })()
-    );
-    return;
-  }
+
+        return fresh;
+      } catch (error) {
+        return caches.match(req);
+      }
+    })()
+  );
+
+  return;
+}
 
   event.respondWith(
     (async () => {
