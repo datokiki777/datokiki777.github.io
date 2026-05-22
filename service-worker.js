@@ -1,6 +1,6 @@
-const CACHE = "client-totals-shell-v8.0";
-const RUNTIME_CACHE = "client-totals-runtime-v8.0";
-const CDN_CACHE = "client-totals-cdn-v8.0";
+const CACHE = "client-totals-shell-v8.1";
+const RUNTIME_CACHE = "client-totals-runtime-v8.1";
+const CDN_CACHE = "client-totals-cdn-v8.1";
 
 const CDN_ASSETS = [
   "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
@@ -11,7 +11,6 @@ const CORE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
-
   "./css/01-base.css",
   "./css/02-layout.css",
   "./css/03-components.css",
@@ -21,7 +20,6 @@ const CORE_ASSETS = [
   "./css/07-print.css",
   "./css/08-theme.css",
   "./css/09-effects.css",
-
   "./js/01-config.js",
   "./js/02-dom.js",
   "./js/03-state.js",
@@ -50,7 +48,6 @@ const CORE_ASSETS = [
   "./js/50-bind-events.js",
   "./js/60-app-init.js",
   "./js/99-debug.js",
-
   "./icons/favicon.ico",
   "./icons/favicon-32.png",
   "./icons/icon-167.png",
@@ -62,30 +59,9 @@ const CORE_ASSETS = [
   "./icons/icon-1024.png"
 ];
 
-async function cacheCoreAssetsFresh() {
-  const cache = await caches.open(CACHE);
-
-  await Promise.all(
-    CORE_ASSETS.map(async (asset) => {
-      try {
-        const req = new Request(asset, { cache: "reload" });
-        const res = await fetch(req);
-
-        if (res && res.status === 200) {
-          await cache.put(asset, res.clone());
-        }
-      } catch (error) {
-        console.warn("Core asset cache failed:", asset, error);
-      }
-    })
-  );
-}
-
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    (async () => {
-      await cacheCoreAssetsFresh();
-    })()
+    caches.open(CACHE).then((cache) => cache.addAll(CORE_ASSETS))
   );
 });
 
@@ -93,7 +69,6 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-
       await Promise.all(
         keys.map((key) => {
           if (key !== CACHE && key !== RUNTIME_CACHE && key !== CDN_CACHE) {
@@ -101,7 +76,6 @@ self.addEventListener("activate", (event) => {
           }
         })
       );
-
       await self.clients.claim();
     })()
   );
@@ -112,56 +86,37 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
 
   const url = new URL(req.url);
-  const isManagedCdnAsset = CDN_ASSETS.includes(url.href);
 
-  if (isManagedCdnAsset) {
+  if (CDN_ASSETS.includes(url.href)) {
     event.respondWith(
-      (async () => {
-        const cached = await caches.match(req);
-
-        if (cached) {
-          fetch(req)
-            .then(async (res) => {
-              if (!res || (res.status !== 200 && res.type !== "opaque")) return;
-              const cache = await caches.open(CDN_CACHE);
-              await cache.put(req, res.clone());
-            })
-            .catch(() => {});
-
-          return cached;
-        }
-
-        try {
-          const fresh = await fetch(req);
-          if (fresh && (fresh.status === 200 || fresh.type === "opaque")) {
-            const cache = await caches.open(CDN_CACHE);
-            await cache.put(req, fresh.clone());
-          }
-          return fresh;
-        } catch (error) {
-          return caches.match(req);
-        }
-      })()
+      caches.match(req).then((cached) => {
+        return cached || fetch(req).then(async (res) => {
+          const cache = await caches.open(CDN_CACHE);
+          cache.put(req, res.clone());
+          return res;
+        });
+      })
     );
     return;
   }
 
   if (url.origin !== self.location.origin) return;
 
-  const isNavigation =
+  const isAppFile =
     req.mode === "navigate" ||
     url.pathname.endsWith(".html") ||
-    url.pathname === "/" ||
-    url.pathname === "";
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".json");
 
-  if (isNavigation) {
+  if (isAppFile) {
     event.respondWith(
       (async () => {
         try {
-          const fresh = await fetch(req, { cache: "reload" });
+          const fresh = await fetch(req, { cache: "no-store" });
 
           if (fresh && fresh.status === 200) {
-            const cache = await caches.open(CACHE);
+            const cache = await caches.open(RUNTIME_CACHE);
             await cache.put(req, fresh.clone());
           }
 
@@ -169,8 +124,8 @@ self.addEventListener("fetch", (event) => {
         } catch (error) {
           return (
             (await caches.match(req)) ||
-            (await caches.match("./")) ||
-            (await caches.match("./index.html"))
+            (await caches.match("./index.html")) ||
+            (await caches.match("./"))
           );
         }
       })()
@@ -178,61 +133,16 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  const isCodeAsset =
-    url.pathname.endsWith(".js") ||
-    url.pathname.endsWith(".css");
-
-  if (isCodeAsset) {
-    event.respondWith(
-      (async () => {
-        try {
-          const fresh = await fetch(req, { cache: "reload" });
-
-          if (fresh && fresh.status === 200 && fresh.type === "basic") {
-            const runtime = await caches.open(RUNTIME_CACHE);
-            await runtime.put(req, fresh.clone());
-          }
-
-          return fresh;
-        } catch (error) {
-          return caches.match(req);
-        }
-      })()
-    );
-    return;
-  }
-
   event.respondWith(
-    (async () => {
-      const cached = await caches.match(req);
-
-      if (cached) {
-        fetch(req)
-          .then(async (res) => {
-            if (!res || res.status !== 200 || res.type !== "basic") return;
-            const runtime = await caches.open(RUNTIME_CACHE);
-            await runtime.put(req, res.clone());
-          })
-          .catch(() => {});
-
-        return cached;
-      }
-
-      try {
-        const res = await fetch(req);
-
-        if (!res || res.status !== 200 || res.type !== "basic") {
-          return res;
+    caches.match(req).then((cached) => {
+      return cached || fetch(req).then(async (res) => {
+        if (res && res.status === 200 && res.type === "basic") {
+          const cache = await caches.open(RUNTIME_CACHE);
+          await cache.put(req, res.clone());
         }
-
-        const runtime = await caches.open(RUNTIME_CACHE);
-        await runtime.put(req, res.clone());
-
         return res;
-      } catch (error) {
-        return caches.match(req);
-      }
-    })()
+      });
+    })
   );
 });
 
