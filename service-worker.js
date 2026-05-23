@@ -1,6 +1,6 @@
-const CACHE = "client-totals-shell-v8.2";
-const RUNTIME_CACHE = "client-totals-runtime-v8.2";
-const CDN_CACHE = "client-totals-cdn-v8.2";
+const CACHE = "client-totals-shell-v8.3";
+const RUNTIME_CACHE = "client-totals-runtime-v8.3";
+const CDN_CACHE = "client-totals-cdn-v8.3";
 
 const CDN_ASSETS = [
   "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
