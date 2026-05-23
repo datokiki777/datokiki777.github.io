@@ -25,9 +25,9 @@ function calcPeriodTotals(period, ratePercent) {
     if (Number.isFinite(grossVal)) gross += grossVal;
     if (Number.isFinite(netVal)) net += netVal;
 
-    const grossShare = hasGross && Number.isFinite(grossVal) ? grossVal * rate : 0;
-    const netShare = hasNet && Number.isFinite(netVal) ? netVal * rate : 0;
-    unpaid += grossShare - netShare;
+    if (!hasNet && hasGross && Number.isFinite(grossVal)) {
+  unpaid += grossVal * rate;
+}
 
     let base = 0;
     if (hasNet && Number.isFinite(netVal)) {
