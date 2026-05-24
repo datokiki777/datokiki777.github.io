@@ -394,6 +394,11 @@
     border-color:#d9c27a !important;
   }
 
+  .doneBtn.state-wrong{
+    background:#e5e7eb !important;
+    border-color:#9ca3af !important;
+  }
+
   /* -------------------------
      Search / status list if ever printed
   ------------------------- */

@@ -595,6 +595,12 @@ html[data-theme="light"] .review-status-fail{
   background:rgba(185,28,28,.08);
 }
 
+html[data-theme="light"] .review-status-wrong{
+  color:#374151;
+  border-color:rgba(75,85,99,.22);
+  background:rgba(107,114,128,.12);
+}
+
 /* =========================================================
    21) Month Row Light Theme
 ========================================================= */

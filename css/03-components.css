@@ -343,7 +343,8 @@
 }
 
 .badge-done,
-.badge-fail{
+.badge-fail,
+.badge-wrong{
   color:#fff;
   padding:6px 12px;
   border-radius:999px;
@@ -353,6 +354,7 @@
 
 .badge-done{ background:#22c55e; }
 .badge-fail{ background:#ef4444; }
+.badge-wrong{ background:#6b7280; }
 
 .badge-fixed{
   background:#facc15;
@@ -678,7 +680,8 @@ html.controls-collapsed .control-deck{
 
 .month-badges .badge-done,
 .month-badges .badge-fail,
-.month-badges .badge-fixed{
+.month-badges .badge-fixed,
+.month-badges .badge-wrong{
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -693,7 +696,8 @@ html.controls-collapsed .control-deck{
 
 .summary-status-strip .badge-done,
 .summary-status-strip .badge-fail,
-.summary-status-strip .badge-fixed{
+.summary-status-strip .badge-fixed,
+.summary-status-strip .badge-wrong{
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.08),
     0 8px 16px rgba(2,6,23,.16);
@@ -863,7 +867,7 @@ html.controls-collapsed .control-deck{
 }
 
 /* =========================================================
-   13) Status buttons/badges (Done/Fail/Fixed)
+   13) Status buttons/badges (Done/Fail/Fixed/Wrong)
 ========================================================= */
 
 .done-head{
@@ -956,6 +960,25 @@ html.controls-collapsed .control-deck{
   background:#fff8cc;
 }
 
+.doneBtn.state-wrong{
+  background:#6b7280;
+  border-color:#9ca3af;
+  box-shadow:0 0 0 2px rgba(156,163,175,.16);
+}
+
+.doneBtn.state-wrong::before{
+  content:"!";
+  position:absolute;
+  left:0;
+  right:0;
+  top:-2px;
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+  line-height:16px;
+  text-align:center;
+}
+
 .doneBtn.state-fail::before{ transform:rotate(45deg); }
 .doneBtn.state-fail::after{ transform:rotate(-45deg); }
 
@@ -997,6 +1020,12 @@ html.controls-collapsed .control-deck{
   font-weight:600;
 }
 
+.review-status-wrong{
+  background:rgba(107,114,128,.22);
+  border:1px solid rgba(156,163,175,.38);
+  color:#d1d5db;
+}
+
 .status-badge{
   display:inline-flex;
   align-items:center;
@@ -1024,6 +1053,11 @@ html.controls-collapsed .control-deck{
   color:black;
 }
 
+.status-badge-wrong{
+  background:#6b7280;
+  color:#fff;
+}
+
 .search-status{
   display:inline-flex;
   align-items:center;
@@ -1049,6 +1083,11 @@ html.controls-collapsed .control-deck{
 .search-status-fixed{
   background:#e6b414;
   color:#111827;
+}
+
+.search-status-wrong{
+  background:#6b7280;
+  color:#fff;
 }
 
 .search-highlight{

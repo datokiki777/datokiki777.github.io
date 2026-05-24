@@ -79,7 +79,8 @@
 
   .badge-done,
   .badge-fail,
-  .badge-fixed{
+  .badge-fixed,
+  .badge-wrong{
     width:28px;
     height:28px;
     min-width:28px;
