@@ -58,6 +58,7 @@ function renderReview() {
       ${statusCounts.done > 0 ? `<span class="badge-done">${statusCounts.done}</span>` : ""}
       ${statusCounts.fail > 0 ? `<span class="badge-fail">${statusCounts.fail}</span>` : ""}
       ${statusCounts.fixed > 0 ? `<span class="badge-fixed">${statusCounts.fixed}</span>` : ""}
+      ${statusCounts.wrong > 0 ? `<span class="badge-wrong">${statusCounts.wrong}</span>` : ""}
     `;
 
     let periodsHtml = "";
@@ -78,7 +79,7 @@ function renderReview() {
         const clients = p.rows.map((r) => {
           const name = r.customer?.trim() || "Client";
           const city = r.city?.trim() || "—";
-          const state = ["none", "done", "fail", "fixed"].includes(r.done) ? r.done : "none";
+          const state = ["none", "done", "fail", "fixed", "wrong"].includes(r.done) ? r.done : "none";
 
           let statusHtml = "";
           if (state === "done") {
@@ -87,6 +88,8 @@ function renderReview() {
             statusHtml = `<span class="review-status review-status-fail">Fail</span>`;
           } else if (state === "fixed") {
             statusHtml = `<span class="review-status review-status-fixed">Fixed</span>`;
+          } else if (state === "wrong") {
+            statusHtml = `<span class="review-status review-status-wrong">Wrong</span>`;
           }
 
           return `

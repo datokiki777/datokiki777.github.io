@@ -251,8 +251,8 @@ async function render() {
        }
 
       if (doneBtn) {
-        const state = ["none", "done", "fail", "fixed"].includes(r.done) ? r.done : "none";
-        doneBtn.classList.remove("state-none", "state-done", "state-fail", "state-fixed");
+        const state = ["none", "done", "fail", "fixed", "wrong"].includes(r.done) ? r.done : "none";
+        doneBtn.classList.remove("state-none", "state-done", "state-fail", "state-fixed", "state-wrong");
         doneBtn.classList.add(`state-${state}`);
       }
 
@@ -364,14 +364,15 @@ async function render() {
 
       // Status change - affects monthly stats and review
       doneBtn?.addEventListener("click", async () => {
-        const current = ["none", "done", "fail", "fixed"].includes(r.done) ? r.done : "none";
+        const current = ["none", "done", "fail", "fixed", "wrong"].includes(r.done) ? r.done : "none";
 
         if (current === "none") r.done = "done";
         else if (current === "done") r.done = "fail";
         else if (current === "fail") r.done = "fixed";
+        else if (current === "fixed") r.done = "wrong";
         else r.done = "none";
 
-        doneBtn.classList.remove("state-none", "state-done", "state-fail", "state-fixed");
+        doneBtn.classList.remove("state-none", "state-done", "state-fail", "state-fixed", "state-wrong");
         doneBtn.classList.add(`state-${r.done}`);
 
         await saveState({ dataChanged: true });

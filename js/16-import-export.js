@@ -283,6 +283,9 @@ function exportPdfAllGroups() {
   doc.setTextColor(215, 170, 20);
   doc.text(`Fixed: ${overallStatus.fixed}`, margin + 70, y);
 
+  doc.setTextColor(110, 120, 135);
+  doc.text(`Wrong: ${overallStatus.wrong}`, margin + 105, y);
+
   doc.setTextColor(0, 0, 0);
   y += lineH;
   hr();
@@ -309,6 +312,9 @@ function exportPdfAllGroups() {
 
     doc.setTextColor(215, 170, 20);
     doc.text(`Fixed: ${statusCounts.fixed}`, margin + 64, y);
+
+    doc.setTextColor(110, 120, 135);
+    doc.text(`Wrong: ${statusCounts.wrong}`, margin + 100, y);
 
     doc.setTextColor(0, 0, 0);
     y += lineH;
@@ -339,13 +345,14 @@ function exportPdfAllGroups() {
         const rg = money(parseMoney(r.gross));
         const rn = money(parseMoney(r.net));
 
-        const state = ["none", "done", "fail", "fixed"].includes(r.done) ? r.done : "none";
+        const state = ["none", "done", "fail", "fixed", "wrong"].includes(r.done) ? r.done : "none";
 
         const baseText = `• ${name} [${city}] | Gross: ${rg} | Net: ${rn}`;
         const statusLabel =
           state === "done" ? " Done"
           : state === "fail" ? " Fail"
           : state === "fixed" ? " Fixed"
+          : state === "wrong" ? " Wrong"
           : "";
 
         doc.setFont("helvetica", "normal");
@@ -366,6 +373,7 @@ function exportPdfAllGroups() {
             if (state === "done") doc.setTextColor(30, 160, 80);
             else if (state === "fail") doc.setTextColor(220, 60, 60);
             else if (state === "fixed") doc.setTextColor(180, 120, 10);
+            else if (state === "wrong") doc.setTextColor(90, 100, 115);
 
             doc.text(statusLabel, statusX, y);
           }
@@ -444,6 +452,7 @@ async function handleExportExcel() {
       let doneCount = 0;
       let failCount = 0;
       let fixedCount = 0;
+      let wrongCount = 0;
 
       (group.data?.periods || []).forEach((period) => {
         const totals = calcPeriodTotals(period, rate);
@@ -458,6 +467,7 @@ async function handleExportExcel() {
           if (status === "done") doneCount++;
           else if (status === "fail") failCount++;
           else if (status === "fixed") fixedCount++;
+          else if (status === "wrong") wrongCount++;
 
           rowData.push({
             Group: groupName,
@@ -493,7 +503,8 @@ async function handleExportExcel() {
         Income: groupFinancials.income,
         Done: doneCount,
         Fail: failCount,
-        Fixed: fixedCount
+        Fixed: fixedCount,
+        Wrong: wrongCount
       });
     });
 
@@ -537,7 +548,8 @@ async function handleExportExcel() {
       { wch: 14 }, // Income
       { wch: 10 }, // Done
       { wch: 10 }, // Fail
-      { wch: 10 }  // Fixed
+      { wch: 10 }, // Fixed
+      { wch: 10 }  // Wrong
     ];
 
     XLSX.utils.book_append_sheet(wb, wsRows, "Rows");
@@ -787,8 +799,8 @@ async function handleImportExcelChange(e) {
          city: String(row.City || "").trim(),
          gross: normalizeMoneyToStoredInteger(row.Gross),
          net: normalizeMoneyToStoredInteger(row.Net),
-        done: ["none", "done", "fail", "fixed"].includes(String(row.Status || "").trim())
-        ? String(row.Status || "").trim()
+        done: ["none", "done", "fail", "fixed", "wrong"].includes(String(row.Status || "").trim().toLowerCase())
+        ? String(row.Status || "").trim().toLowerCase()
         : "none"
       });
     });

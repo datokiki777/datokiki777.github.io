@@ -61,7 +61,7 @@ function normalizeGroupData(d) {
           city: r?.city ?? "",
           gross: r?.gross ?? "",
           net: r?.net ?? "",
-          done: ["none", "done", "fail", "fixed"].includes(r?.done) ? r.done : "none",
+          done: ["none", "done", "fail", "fixed", "wrong"].includes(r?.done) ? r.done : "none",
         }))
       : [emptyRow()],
   }));

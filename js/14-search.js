@@ -35,7 +35,7 @@ function buildReviewSearchIndex() {
           city,
           gross: fmt(parseMoney(r?.gross)),
           net: fmt(parseMoney(r?.net)),
-          status: ["done", "fail", "fixed"].includes(r?.done) ? r.done : "none",
+          status: ["done", "fail", "fixed", "wrong"].includes(r?.done) ? r.done : "none",
         });
       });
     });
@@ -116,6 +116,8 @@ function renderSearchResults(list, query, resultsEl) {
             ? `<span class="search-status search-status-fail">Fail</span>`
             : x.status === "fixed"
             ? `<span class="search-status search-status-fixed">Fixed</span>`
+            : x.status === "wrong"
+            ? `<span class="search-status search-status-wrong">Wrong</span>`
             : ``
         }
       </div>

@@ -314,11 +314,13 @@ function openStatusListModal(status, clients) {
     status === "done" ? "Done" :
     status === "fail" ? "Fail" :
     status === "fixed" ? "Fixed" :
+    status === "wrong" ? "Wrong" :
     "Status";
   const statusColor =
     status === "done" ? "status-badge-done" :
     status === "fail" ? "status-badge-fail" :
     status === "fixed" ? "status-badge-fixed" :
+    status === "wrong" ? "status-badge-wrong" :
     "";
 
   statusListTitle.innerHTML = `
@@ -585,8 +587,9 @@ function initStatusBadgeActions() {
   const doneEl = document.getElementById("monthDone");
   const failEl = document.getElementById("monthFail");
   const fixedEl = document.getElementById("monthFixed");
+  const wrongEl = document.getElementById("monthWrong");
 
-  [doneEl, failEl, fixedEl].forEach((el) => {
+  [doneEl, failEl, fixedEl, wrongEl].forEach((el) => {
     if (!el) return;
 
     el.style.cursor = "pointer";

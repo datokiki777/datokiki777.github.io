@@ -313,7 +313,7 @@ function runAppDebugChecks() {
           rowIdSet.add(row.id);
         }
 
-        const validDone = ["none", "done", "fail", "fixed"];
+        const validDone = ["none", "done", "fail", "fixed", "wrong"];
         if (!validDone.includes(row?.done)) {
           addDebugIssue(issues, "warning", `${rowLabel}: invalid done status "${row?.done}"`, {
             groupIndex: gi,

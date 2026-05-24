@@ -14,7 +14,7 @@ if (appState.grandMode === "active") {
   const current = activeGroup();
   status = current
     ? calcGroupStatusCounts(current)
-    : { done: 0, fail: 0, fixed: 0 };
+    : { done: 0, fail: 0, fixed: 0, wrong: 0 };
 } else {
   status = calcStatusCountsByMode("all");
 }
@@ -22,6 +22,7 @@ if (appState.grandMode === "active") {
   const doneEl = document.getElementById("monthDone");
   const failEl = document.getElementById("monthFail");
   const fixedEl = document.getElementById("monthFixed");
+  const wrongEl = document.getElementById("monthWrong");
 
   monthLabel.textContent = formatMonthKey(currentKey);
   animateNumber(monthGrossEl, totals.gross);
@@ -31,6 +32,7 @@ if (appState.grandMode === "active") {
   if (doneEl) doneEl.textContent = status.done;
   if (failEl) failEl.textContent = status.fail;
   if (fixedEl) fixedEl.textContent = status.fixed;
+  if (wrongEl) wrongEl.textContent = status.wrong;
 
   if (monthPrevBtn) monthPrevBtn.disabled = !currentKey || currentKey === keys[0];
   if (monthNextBtn) monthNextBtn.disabled = !currentKey || currentKey === keys[keys.length - 1];
