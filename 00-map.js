@@ -486,6 +486,7 @@ STRUCTURAL CHANGE → render() (31-render-periods.js):
 DATA CHANGE → granular update (40-update-flow.js):
 - gross/net input → updateAfterRowChange()
 - status change → updateAfterStatusChange()
+  → recalculates edit period totals and grand totals because Wrong excludes row money
 - from/to date → updateAfterPeriodMetaChange()
 - default rate → updateAfterGlobalChange()
 - default salary → updateAfterSalaryChange()
@@ -493,6 +494,8 @@ DATA CHANGE → granular update (40-update-flow.js):
 - month cursor shift → renderMonthlySection()
 
 SALARY / INCOME LOGIC:
+- Rows marked Wrong are excluded from financial totals even if Gross/Net values are filled
+- Wrong rows do not affect Gross, Net, My €, Unpaid, Income, monthly totals, or salary weeks
 - defaultSalaryPer28Days = group salary for 28 days / 4 weeks
 - weekly salary = defaultSalaryPer28Days / 4
 - Gross period weeks:
