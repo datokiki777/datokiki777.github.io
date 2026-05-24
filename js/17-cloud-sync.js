@@ -37,6 +37,20 @@ function formatCloudSnapshotDate(value) {
   return formatDateForRange(date);
 }
 
+function getSnapshotAppData(payload) {
+  if (!payload || typeof payload !== "object") return null;
+
+  if (payload.data && typeof payload.data === "object") {
+    if (Array.isArray(payload.data.groups)) return payload.data;
+    if (payload.data.data && Array.isArray(payload.data.data.groups)) {
+      return payload.data.data;
+    }
+  }
+
+  if (Array.isArray(payload.groups)) return payload;
+  return null;
+}
+
 async function getCloudRefs() {
   const db = window.__db;
   if (!db) throw new Error("Firebase not initialized");
@@ -262,7 +276,8 @@ async function finalizePendingHistoryDayIfNeeded() {
         if (!mainDoc.exists) return false;
 
         const mainPayload = mainDoc.data();
-        if (!mainPayload?.data) return false;
+        const mainData = getSnapshotAppData(mainPayload);
+        if (!mainData) return false;
 
         const expireAt = new Date();
         expireAt.setDate(expireAt.getDate() + 30);
@@ -274,7 +289,7 @@ async function finalizePendingHistoryDayIfNeeded() {
           sourceUpdatedAt: mainPayload.updatedAt || "",
           savedAt: new Date().toISOString(),
           expireAt: firebase.firestore.Timestamp.fromDate(expireAt),
-          data: mainPayload.data
+          data: mainData
         });
 
         await setLastHistorySavedDay(pendingDay);
@@ -302,6 +317,9 @@ async function getCloudHistorySnapshots() {
 
     snap.forEach((doc) => {
       const data = doc.data() || {};
+      const snapshotData = getSnapshotAppData(data);
+      if (!snapshotData) return;
+
       items.push({
         id: doc.id,
         type: "history",
@@ -309,7 +327,7 @@ async function getCloudHistorySnapshots() {
         historyDayDisplay: data.historyDayDisplay || toDisplayDay(doc.id),
         savedAt: data.savedAt || "",
         sourceUpdatedAt: data.sourceUpdatedAt || "",
-        data: data.data || null
+        data: snapshotData
       });
     });
 
@@ -329,12 +347,18 @@ async function chooseCloudRestoreSource() {
 
   if (mainDoc.exists) {
     const mainData = mainDoc.data() || {};
-    const latestDate = formatCloudSnapshotDate(mainData.updatedAt);
-    options.push({
-      id: "latest",
-      label: `Latest Cloud${latestDate ? " - " + latestDate : ""}`,
-      payload: mainData
-    });
+    const latestSnapshotData = getSnapshotAppData(mainData);
+    if (latestSnapshotData) {
+      const latestDate = formatCloudSnapshotDate(mainData.updatedAt);
+      options.push({
+        id: "latest",
+        label: `Latest Cloud${latestDate ? " - " + latestDate : ""}`,
+        payload: {
+          ...mainData,
+          data: latestSnapshotData
+        }
+      });
+    }
   }
 
   historyItems.forEach((item) => {
@@ -397,7 +421,7 @@ async function syncFromCloudOnStartup() {
   }
 
   const payload = doc.data() || {};
-  const cloudData = payload.data;
+  const cloudData = getSnapshotAppData(payload);
 
   if (!cloudData) return false;
 
@@ -501,7 +525,7 @@ async function handleCloudLoad() {
     }
 
     const payload = selected.payload;
-    const restoreData = payload?.data;
+    const restoreData = getSnapshotAppData(payload);
     if (!restoreData) {
       await askConfirm(
         "Selected cloud snapshot is invalid.",
