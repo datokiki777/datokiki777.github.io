@@ -160,7 +160,7 @@ async function render() {
       if (collapseMeta) collapseMeta.textContent = formatPeriodPreview(p.from, p.to);
       syncPaidWeeksInputMax();
 
-      await saveState();
+      await saveState({ dataChanged: true });
       await updateAfterPeriodMetaChange(p.id);
     });
 
@@ -182,7 +182,7 @@ async function render() {
       if (collapseMeta) collapseMeta.textContent = formatPeriodPreview(p.from, p.to);
       syncPaidWeeksInputMax();
 
-      await saveState();
+      await saveState({ dataChanged: true });
       await updateAfterPeriodMetaChange(p.id);
     });
 
@@ -200,7 +200,7 @@ async function render() {
       paidWeeksEl.value = p.paidWeeks;
 
       queueDeferredSave(totalsFieldSaveTimers, `${p.id}-paidWeeks`, 120, async () => {
-        await saveState();
+        await saveState({ dataChanged: true });
         await updateAfterSalaryChange();
       });
     });
@@ -215,7 +215,7 @@ async function render() {
 
     paidWeeksEl?.addEventListener("change", async () => {
       await flushDeferredSave(totalsFieldSaveTimers, `${p.id}-paidWeeks`, async () => {
-        await saveState();
+        await saveState({ dataChanged: true });
         await updateAfterSalaryChange();
       });
     });
@@ -260,7 +260,7 @@ async function render() {
       custEl?.addEventListener("input", () => {
         r.customer = custEl.value;
         queueDeferredSave(textFieldSaveTimers, r.id, 220, async () => {
-          await saveState();
+          await saveState({ dataChanged: true });
         });
       });
 
@@ -268,7 +268,7 @@ async function render() {
       cityEl?.addEventListener("input", () => {
         r.city = cityEl.value;
         queueDeferredSave(textFieldSaveTimers, r.id, 220, async () => {
-          await saveState();
+          await saveState({ dataChanged: true });
         });
       });
 
@@ -281,7 +281,7 @@ async function render() {
 
         r.gross = cleaned;
         queueDeferredSave(totalsFieldSaveTimers, r.id, 120, async () => {
-          await saveState();
+          await saveState({ dataChanged: true });
           await updateAfterRowChange(p.id);
         });
       });
@@ -301,26 +301,26 @@ async function render() {
 
         r.net = cleaned;
         queueDeferredSave(totalsFieldSaveTimers, r.id, 120, async () => {
-          await saveState();
+          await saveState({ dataChanged: true });
           await updateAfterRowChange(p.id);
         });
       });
 
       custEl?.addEventListener("change", async () => {
         await flushDeferredSave(textFieldSaveTimers, r.id, async () => {
-          await saveState();
+          await saveState({ dataChanged: true });
         });
       });
 
       cityEl?.addEventListener("change", async () => {
         await flushDeferredSave(textFieldSaveTimers, r.id, async () => {
-          await saveState();
+          await saveState({ dataChanged: true });
         });
       });
 
       grossEl?.addEventListener("change", async () => {
         await flushDeferredSave(totalsFieldSaveTimers, r.id, async () => {
-          await saveState();
+          await saveState({ dataChanged: true });
           await updateAfterRowChange(p.id);
         });
       });
@@ -353,7 +353,7 @@ async function render() {
           clearTimeout(pendingTotalsTimer);
           totalsFieldSaveTimers.delete(r.id);
         }
-        await saveState();
+        await saveState({ dataChanged: true });
         await updateAfterRowChange(p.id);
 
         setTimeout(() => {
@@ -374,7 +374,7 @@ async function render() {
         doneBtn.classList.remove("state-none", "state-done", "state-fail", "state-fixed");
         doneBtn.classList.add(`state-${r.done}`);
 
-        await saveState();
+        await saveState({ dataChanged: true });
         await updateAfterStatusChange(p.id);
       });
 
@@ -402,7 +402,7 @@ async function render() {
         p.rows = p.rows.filter((x) => x.id !== r.id);
         if (p.rows.length === 0) p.rows.push(emptyRow());
 
-        await saveState();
+        await saveState({ dataChanged: true, cloudReason: "delete-row" });
         render(); // Full render needed after row removal
         
       });
@@ -417,7 +417,7 @@ async function render() {
       // FIX: period ღია დარჩეს render-ის შემდეგაც
       await setPeriodCollapsed(p.id, false);
 
-      await saveState();
+      await saveState({ dataChanged: true, cloudReason: "add-row" });
       render(); // Full render needed to show new row
       if (appState.uiMode === "review") renderReview();
 
@@ -454,7 +454,7 @@ async function render() {
       st.periods.push(newPeriod);
       await setPeriodCollapsed(newPeriod.id, false);
 
-      await saveState();
+      await saveState({ dataChanged: true, cloudReason: "add-period" });
       render(); // Full render needed to show new period
       if (appState.uiMode === "review") renderReview();
 
@@ -490,7 +490,7 @@ async function render() {
       st.periods = st.periods.filter((x) => x.id !== p.id);
       if (st.periods.length === 0) st.periods = defaultGroupData().periods;
 
-      await saveState();
+      await saveState({ dataChanged: true, cloudReason: "delete-period" });
       render(); // Full render needed after period removal
       if (appState.uiMode === "review") renderReview();
     });

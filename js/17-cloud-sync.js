@@ -2,7 +2,7 @@
 // Auto Cloud Sync
 // Local-first app, Firestore as background sync layer
 
-const CLOUD_SYNC_DEBOUNCE_MS = 5000;
+const CLOUD_SYNC_DEBOUNCE_MS = 8000;
 const CLOUD_SYNC_FORCE_MS = 30000;
 const CLOUD_HISTORY_COLLECTION = "backups_history";
 const CLOUD_META_PENDING_HISTORY_DAY = "__cloud_pending_history_day";
@@ -11,6 +11,7 @@ const CLOUD_META_LAST_HISTORY_SAVED_DAY = "__cloud_last_history_saved_day";
 let cloudSyncTimer = null;
 let cloudForceTimer = null;
 let cloudSyncInFlight = false;
+let cloudChangesWhileSyncing = false;
 let cloudHasPendingChanges = false;
 let cloudLastSyncedAt = "";
 let cloudLastError = "";
@@ -130,10 +131,13 @@ function setCloudSyncStatus(status, at = "") {
 
 async function writeCloudMainSnapshot() {
   const refs = await getCloudRefs();
+  const safeData = JSON.parse(JSON.stringify(appState));
 
   const payload = {
-    data: appState,
-    updatedAt: new Date().toISOString()
+    data: safeData,
+    updatedAt: new Date().toISOString(),
+    dataUpdatedAt:
+      safeData.dataUpdatedAt || new Date().toISOString()
   };
 
   await refs.mainRef.set(payload);
@@ -171,6 +175,10 @@ async function runCloudSyncNow(reason = "auto") {
     return false;
   } finally {
     cloudSyncInFlight = false;
+    if (cloudChangesWhileSyncing) {
+      cloudChangesWhileSyncing = false;
+      scheduleCloudAutoSync("changes-during-sync");
+    }
   }
 }
 
@@ -187,6 +195,9 @@ function ensureCloudForceTimer() {
 
 function scheduleCloudAutoSync(reason = "edit") {
   cloudHasPendingChanges = true;
+  if (cloudSyncInFlight) {
+    cloudChangesWhileSyncing = true;
+  }
   markPendingHistoryDay(toDayKey());
 
   if (!navigator.onLine) {
@@ -371,6 +382,65 @@ async function refreshCloudSyncStatusFromServer() {
   }
 }
 
+async function syncFromCloudOnStartup() {
+  if (!window.__db || !navigator.onLine) return false;
+
+  const refs = await getCloudRefs();
+  const doc = await refs.mainRef.get();
+
+  if (!doc.exists) {
+    if (appState?.dataUpdatedAt) {
+      cloudHasPendingChanges = true;
+      triggerImmediateCloudSync("startup-no-cloud");
+    }
+    return false;
+  }
+
+  const payload = doc.data() || {};
+  const cloudData = payload.data;
+
+  if (!cloudData) return false;
+
+  const localTime = new Date(
+    appState?.dataUpdatedAt || 0
+  ).getTime();
+
+  const cloudTime = new Date(
+    cloudData?.dataUpdatedAt ||
+    payload.updatedAt ||
+    0
+  ).getTime();
+
+  if (cloudTime > localTime) {
+    appState = normalizeAppState(cloudData);
+
+    cleanupDefaultGroup();
+
+    await saveState({
+      skipCloudAutoSync: true
+    });
+
+    setCloudSyncStatus(
+      "synced",
+      payload.updatedAt || ""
+    );
+
+    return true;
+  }
+
+  if (localTime > cloudTime) {
+    cloudHasPendingChanges = true;
+
+    await triggerImmediateCloudSync(
+      "startup-local-newer"
+    );
+
+    return true;
+  }
+
+  return false;
+}
+
 async function handleCloudSave() {
   if (!window.__db) {
     await askConfirm(
@@ -528,6 +598,7 @@ window.refreshCloudSyncStatusFromServer = refreshCloudSyncStatusFromServer;
 window.handleCloudSave = handleCloudSave;
 window.handleCloudLoad = handleCloudLoad;
 window.finalizePendingHistoryDayIfNeeded = finalizePendingHistoryDayIfNeeded;
+window.syncFromCloudOnStartup = syncFromCloudOnStartup;
 window.onCloudBackendReady = async (error) => {
   if (error) {
     if (cloudHasPendingChanges) {

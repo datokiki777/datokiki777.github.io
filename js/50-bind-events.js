@@ -96,9 +96,6 @@ archiveGroupBtn?.addEventListener("click", async () => {
   ).then(async (ok) => {
     if (!ok) return;
     await toggleArchiveGroup(g.id);
-    if (typeof triggerImmediateCloudSync === "function") {
-      triggerImmediateCloudSync("archive-toggle");
-    }
     render();
     if (appState.uiMode === "review") renderReview();
   });
@@ -112,7 +109,7 @@ defaultRateInput?.addEventListener("input", async () => {
   const g = activeGroup();
   if (!g?.data) return;
   g.data.defaultRatePercent = clampRate(defaultRateInput.value);
-  await saveState();
+  await saveState({ dataChanged: true });
   await updateAfterGlobalChange();
 });
 
@@ -121,7 +118,7 @@ defaultSalaryInput?.addEventListener("input", async () => {
   if (!g?.data) return;
   g.data.defaultSalaryPer28Days = normalizeSalaryAmount(defaultSalaryInput.value);
   defaultSalaryInput.value = String(g.data.defaultSalaryPer28Days || "");
-  await saveState();
+  await saveState({ dataChanged: true });
   await updateAfterSalaryChange();
 });
 
@@ -148,10 +145,7 @@ addPeriodBtn?.addEventListener("click", async () => {
   st.periods.push(newPeriod);
   await setPeriodCollapsed(newPeriod.id, false);
 
-  await saveState();
-  if (typeof triggerImmediateCloudSync === "function") {
-    triggerImmediateCloudSync("add-period");
-  }
+  await saveState({ dataChanged: true, cloudReason: "add-period" });
   render();
   if (appState.uiMode === "review") renderReview();
 
@@ -190,10 +184,7 @@ resetBtn?.addEventListener("click", async () => {
   if (!ok) return;
 
   g.data = defaultGroupData();
-  await saveState();
-  if (typeof triggerImmediateCloudSync === "function") {
-    triggerImmediateCloudSync("reset-group");
-  }
+  await saveState({ dataChanged: true, cloudReason: "reset-group" });
   render();
   if (appState.uiMode === "review") renderReview();
 });

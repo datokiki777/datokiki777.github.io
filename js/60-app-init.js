@@ -65,6 +65,18 @@ async function initApp() {
     // 2. Load app state from IndexedDB
     appState = await loadState();
 
+    if (typeof window.__firebaseReady?.then === "function") {
+      try {
+        await window.__firebaseReady;
+      } catch (e) {
+        // local-only mode is allowed
+      }
+    }
+
+    if (typeof syncFromCloudOnStartup === "function") {
+      await syncFromCloudOnStartup();
+    }
+
     // 3. Initialize UI chrome/hooks
     await ensureAppChromeInitialized();
 
@@ -72,17 +84,9 @@ async function initApp() {
     await setMode(appState.uiMode || "review");
     
     // 10.5 Finalize previous day cloud history if needed
-if (typeof window.__firebaseReady?.then === "function") {
-  try {
-    await window.__firebaseReady;
-  } catch (e) {
-    // local-only mode is allowed
-  }
-}
-
-if (typeof finalizePendingHistoryDayIfNeeded === "function" && window.__db) {
-  await finalizePendingHistoryDayIfNeeded();
-}
+    if (typeof finalizePendingHistoryDayIfNeeded === "function" && window.__db) {
+      await finalizePendingHistoryDayIfNeeded();
+    }
 
     // 11. Show backup reminder if needed
     setTimeout(async () => {

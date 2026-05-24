@@ -13,7 +13,7 @@ async function addClientToLastPeriod() {
   // 🔥 FIX: გახსენი period სანამ render გავა
   await setPeriodCollapsed(last.id, false);
 
-  await saveState();
+  await saveState({ dataChanged: true, cloudReason: "add-row" });
   render();
 
   // 🔥 UX: დაასკროლე ახალ row-ზე

@@ -36,7 +36,7 @@ async function addGroup() {
   appState.activeGroupId = g.id;
   cleanupDefaultGroup();
   appState.lastActiveGroupIdActive = g.id;
-  await saveState();
+  await saveState({ dataChanged: true, cloudReason: "add-group" });
 
   await setMode("edit");
   render();
@@ -60,7 +60,7 @@ async function renameGroup() {
   if (!name) return;
 
   g.name = name.toString().trim() || g.name;
-  await saveState();
+  await saveState({ dataChanged: true, cloudReason: "rename-group" });
   renderGroupSelect();
   render();
   if (appState.uiMode === "review") renderReview();
@@ -108,7 +108,7 @@ async function deleteGroup() {
     appState.lastActiveGroupIdActive = appState.activeGroupId;
   }
 
-  await saveState();
+  await saveState({ dataChanged: true, cloudReason: "delete-group" });
   render();
   if (appState.uiMode === "review") renderReview();
 }
@@ -151,7 +151,7 @@ async function toggleArchiveGroup(groupId) {
     appState.grandMode = "all";
   }
 
-  await saveState();
+  await saveState({ dataChanged: true, cloudReason: "archive-toggle" });
   updateWorkspaceSwitchUI();
   renderGroupSelect();
   render();

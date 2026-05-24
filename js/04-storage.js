@@ -92,19 +92,26 @@ async function dbDelete(key) {
 
 async function saveState(options = {}) {
   try {
+    const isDataChanged = options.dataChanged === true;
+
     if (appState) {
+      if (isDataChanged) {
+        appState.dataUpdatedAt = new Date().toISOString();
+      }
+
       await dbSet(STORAGE_KEY_APP_STATE, appState);
     }
 
-    if (!options.skipBackupReminderDirty) {
+    if (!options.skipBackupReminderDirty && isDataChanged) {
       await markBackupReminderDirty();
     }
 
     if (
+      isDataChanged &&
       !options.skipCloudAutoSync &&
       typeof scheduleCloudAutoSync === "function"
     ) {
-      scheduleCloudAutoSync(options.cloudReason || "save-state");
+      scheduleCloudAutoSync(options.cloudReason || "data-change");
     }
   } catch (error) {
     console.error("Failed to save state:", error);

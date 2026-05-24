@@ -20,6 +20,7 @@ function defaultAppState() {
     grandMode: "active",
     lastReviewGrandMode: "active",
     uiMode: "review",
+    dataUpdatedAt: "",
     reviewCollapsedGroups: {}
   };
 }
@@ -78,6 +79,7 @@ function normalizeAppState(s) {
     grandMode: s?.grandMode === "all" ? "all" : "active",
     lastReviewGrandMode: s?.lastReviewGrandMode === "all" ? "all" : "active",
     uiMode: s?.uiMode === "edit" ? "edit" : "review",
+    dataUpdatedAt: s?.dataUpdatedAt || "",
     reviewCollapsedGroups:
   s?.reviewCollapsedGroups && typeof s.reviewCollapsedGroups === "object"
     ? s.reviewCollapsedGroups
