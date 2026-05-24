@@ -54,6 +54,8 @@ async function updateAfterPeriodMetaChange(periodId) {
 }
 
 async function updateAfterStatusChange(periodId) {
+  renderEditPeriodTotals(periodId);
+  renderGrandTotals();
   await renderMonthlySection();
   renderOverviewSection();
   if (appState.uiMode === "review") renderReview();

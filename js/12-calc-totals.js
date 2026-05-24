@@ -1,6 +1,10 @@
 // 12-calc-totals.js
 // Pure calculation of financial totals
 
+function isWrongRow(row) {
+  return row?.done === "wrong";
+}
+
 function calcPeriodTotals(period, ratePercent) {
   const rows = period?.rows || [];
   const rate = clampRate(ratePercent) / 100;
@@ -11,6 +15,8 @@ function calcPeriodTotals(period, ratePercent) {
   let unpaid = 0;
 
   rows.forEach((r) => {
+    if (isWrongRow(r)) return;
+
     const grossRaw = String(r?.gross ?? "").trim();
     const netRaw = String(r?.net ?? "").trim();
 
@@ -49,6 +55,8 @@ function calcEditPeriodMyOnly(period, ratePercent) {
   let my = 0;
 
   rows.forEach((r) => {
+    if (isWrongRow(r)) return;
+
     const grossRaw = String(r?.gross ?? "").trim();
     const netRaw = String(r?.net ?? "").trim();
 
@@ -74,6 +82,8 @@ function calcEditPeriodMyOnly(period, ratePercent) {
 }
 
 function rowHasMoneyValue(row, key) {
+  if (isWrongRow(row)) return false;
+
   const raw = String(row?.[key] ?? "").trim();
   if (!raw) return false;
   return Number.isFinite(parseMoney(raw));
