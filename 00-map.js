@@ -8,6 +8,7 @@
 // - 16-import-export.js: JSON merge/replace and Excel replace use saveState({ dataChanged: true }).
 // - 17-cloud-sync.js: debounce is 8000ms, snapshots are deep-cloned, payload includes dataUpdatedAt,
 //   edits during in-flight sync queue another sync, and syncFromCloudOnStartup() implements latest-device-wins.
+//   getSnapshotAppData() reads latest/history snapshots from current, legacy, or nested payload shapes.
 // - 20-actions-groups.js / 22-actions-rows.js / 31-render-periods.js / 50-bind-events.js:
 //   real data edits call saveState({ dataChanged: true }); UI-only navigation/toggles remain plain saveState().
 // - 60-app-init.js: after loadState(), waits for Firebase when available and runs syncFromCloudOnStartup().
