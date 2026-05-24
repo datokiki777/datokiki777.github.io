@@ -54,6 +54,8 @@
 - .review-group-toggle (+ tap/focus highlight disabled)
 - .review-group-toggle (:active press effect, scale + background)
 - .review-group-toggle (tap highlight disabled, enhanced press effect)
+- .badge-wrong / .doneBtn.state-wrong / .review-status-wrong / .status-badge-wrong / .search-status-wrong
+  → gray Wrong status, same badge size as Done/Fail/Fixed
 2
 
 ---

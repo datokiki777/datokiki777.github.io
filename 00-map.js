@@ -342,7 +342,7 @@ WORKSPACE & MODE:
 ═══════════════════════════════════════
 - renderMonthlyStats(), renderMonthlySection()
   → month Gross / Net / My stay monthly
-  → Done / Fail / Fixed use FULL status counts:
+  → Done / Fail / Fixed / Wrong use FULL status counts:
     Current = current group full stats
     All = all groups full stats
 
