@@ -198,6 +198,18 @@
   height:30px;
   font-size:12px;
 }
+
+  .client-item{
+    flex-direction:column;
+  }
+
+  .client-values{
+    justify-content:flex-start;
+  }
+
+  .client-comment{
+    max-width:none;
+  }
 }
 
 /* =========================================================

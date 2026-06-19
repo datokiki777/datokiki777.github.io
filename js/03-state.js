@@ -26,7 +26,7 @@ function defaultAppState() {
 }
 
 function emptyRow() {
-  return { id: uuid(), customer: "", city: "", gross: "", net: "", done: "none" };
+  return { id: uuid(), customer: "", city: "", gross: "", net: "", comment: "", done: "none" };
 }
 
 function defaultGroupData(rate = 15.0, salaryPer28Days = 0) {
@@ -61,6 +61,7 @@ function normalizeGroupData(d) {
           city: r?.city ?? "",
           gross: r?.gross ?? "",
           net: r?.net ?? "",
+          comment: r?.comment ?? "",
           done: ["none", "done", "fail", "fixed", "wrong"].includes(r?.done) ? r.done : "none",
         }))
       : [emptyRow()],
@@ -191,6 +192,7 @@ function isDefaultEmptyGroup(g) {
     !r.city &&
     !r.gross &&
     !r.net &&
+    !r.comment &&
     (!r.done || r.done === "none");
 
   return isEmpty;

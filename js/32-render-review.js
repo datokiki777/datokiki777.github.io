@@ -79,6 +79,7 @@ function renderReview() {
         const clients = p.rows.map((r) => {
           const name = r.customer?.trim() || "Client";
           const city = r.city?.trim() || "—";
+          const comment = String(r.comment ?? "").trim();
           const state = ["none", "done", "fail", "fixed", "wrong"].includes(r.done) ? r.done : "none";
 
           let statusHtml = "";
@@ -100,6 +101,12 @@ function renderReview() {
                   ${statusHtml}
                 </div>
                 <div class="review-sub client-city" style="margin:2px 0 0 0;">City: <b>${escapeHtml(city)}</b></div>
+                ${comment ? `
+                  <div class="client-comment">
+                    <span class="client-comment-icon" aria-hidden="true">&#9998;</span>
+                    <span>${escapeHtml(comment)}</span>
+                  </div>
+                ` : ""}
               </div>
               <div class="client-values client-finance">
                 <span>Gross:</span> <b>${fmt(parseMoney(r.gross))}</b>

@@ -457,6 +457,27 @@ html[data-theme="light"] .client-item{
   background:rgba(255,255,255,.72);
 }
 
+html[data-theme="light"] .row-comment-editor.has-comment summary{
+  color:#0f766e;
+}
+
+html[data-theme="light"] .row-comment-icon,
+html[data-theme="light"] .client-comment-icon{
+  color:#0f766e;
+}
+
+html[data-theme="light"] .row-comment-input{
+  background:rgba(255,255,255,.78);
+  border-color:rgba(15,118,110,.24);
+  color:#0f172a;
+}
+
+html[data-theme="light"] .client-comment{
+  background:linear-gradient(135deg, rgba(20,184,166,.10), rgba(59,130,246,.05));
+  border-color:rgba(15,118,110,.20);
+  color:#0f172a;
+}
+
 /* =========================================================
    15) Badge Light Theme
 ========================================================= */

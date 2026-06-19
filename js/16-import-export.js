@@ -381,6 +381,20 @@ function exportPdfAllGroups() {
           y += lineH;
         });
 
+        const comment = String(r.comment ?? "").trim();
+        if (comment) {
+          const commentLines = doc.splitTextToSize(`Comment: ${comment}`, maxW - 8);
+          doc.setFont("helvetica", "italic");
+          doc.setFontSize(9);
+          doc.setTextColor(70, 90, 105);
+
+          commentLines.forEach((line) => {
+            addPageIfNeeded(lineH);
+            doc.text(line, margin + 8, y);
+            y += lineH;
+          });
+        }
+
         doc.setTextColor(0, 0, 0);
       });
 
@@ -479,6 +493,7 @@ async function handleExportExcel() {
             PaidWeeks: normalizePaidWeeks(period.paidWeeks),
             Client: r.customer || "",
             City: r.city || "",
+            Comment: r.comment || "",
             Gross: parseMoney(r.gross),
             Net: parseMoney(r.net),
             Status: status
@@ -652,6 +667,11 @@ async function handleImportExcelChange(e) {
       city: "City",
       town: "City",
 
+      comment: "Comment",
+      comments: "Comment",
+      note: "Comment",
+      notes: "Comment",
+
       gross: "Gross",
       brutto: "Gross",
 
@@ -690,6 +710,7 @@ async function handleImportExcelChange(e) {
         PaidWeeks: out.PaidWeeks ?? "",
         Client: out.Client ?? "",
         City: out.City ?? "",
+        Comment: out.Comment ?? "",
         Gross: out.Gross ?? "",
         Net: out.Net ?? "",
         Status: out.Status ?? ""
@@ -797,6 +818,7 @@ async function handleImportExcelChange(e) {
          id: uuid(),
          customer: String(row.Client || "").trim(),
          city: String(row.City || "").trim(),
+         comment: String(row.Comment || "").trim(),
          gross: normalizeMoneyToStoredInteger(row.Gross),
          net: normalizeMoneyToStoredInteger(row.Net),
         done: ["none", "done", "fail", "fixed", "wrong"].includes(String(row.Status || "").trim().toLowerCase())
@@ -830,6 +852,7 @@ async function handleImportExcelChange(e) {
             id: uuid(),
             customer: "",
             city: "",
+            comment: "",
             gross: "",
             net: "",
             done: "none"

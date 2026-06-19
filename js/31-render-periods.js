@@ -233,6 +233,9 @@ async function render() {
       const cityEl = rowNode.querySelector(".city");
       const grossEl = rowNode.querySelector(".gross");
       const netEl = rowNode.querySelector(".net");
+      const commentEditorEl = rowNode.querySelector(".row-comment-editor");
+      const commentEl = rowNode.querySelector(".row-comment-input");
+      const commentStateEl = rowNode.querySelector(".row-comment-state");
       const doneBtn = rowNode.querySelector(".doneBtn");
       const removeRowBtn = rowNode.querySelector(".removeRow");
 
@@ -249,6 +252,17 @@ async function render() {
           netEl.inputMode = "numeric";
           netEl.setAttribute("pattern", "[0-9]*");
        }
+
+      const syncCommentEditorState = () => {
+        const hasComment = String(r.comment ?? "").trim().length > 0;
+        commentEditorEl?.classList.toggle("has-comment", hasComment);
+        if (commentStateEl) {
+          commentStateEl.textContent = hasComment ? "Saved" : "Add note";
+        }
+      };
+
+      if (commentEl) commentEl.value = r.comment ?? "";
+      syncCommentEditorState();
 
       if (doneBtn) {
         const state = ["none", "done", "fail", "fixed", "wrong"].includes(r.done) ? r.done : "none";
@@ -268,6 +282,14 @@ async function render() {
       cityEl?.addEventListener("input", () => {
         r.city = cityEl.value;
         queueDeferredSave(textFieldSaveTimers, r.id, 220, async () => {
+          await saveState({ dataChanged: true });
+        });
+      });
+
+      commentEl?.addEventListener("input", () => {
+        r.comment = commentEl.value;
+        syncCommentEditorState();
+        queueDeferredSave(textFieldSaveTimers, `${r.id}-comment`, 260, async () => {
           await saveState({ dataChanged: true });
         });
       });
@@ -314,6 +336,14 @@ async function render() {
 
       cityEl?.addEventListener("change", async () => {
         await flushDeferredSave(textFieldSaveTimers, r.id, async () => {
+          await saveState({ dataChanged: true });
+        });
+      });
+
+      commentEl?.addEventListener("change", async () => {
+        await flushDeferredSave(textFieldSaveTimers, `${r.id}-comment`, async () => {
+          r.comment = commentEl.value;
+          syncCommentEditorState();
           await saveState({ dataChanged: true });
         });
       });
@@ -392,6 +422,12 @@ async function render() {
         if (pendingTextTimer) {
           clearTimeout(pendingTextTimer);
           textFieldSaveTimers.delete(r.id);
+        }
+
+        const pendingCommentTimer = textFieldSaveTimers.get(`${r.id}-comment`);
+        if (pendingCommentTimer) {
+          clearTimeout(pendingCommentTimer);
+          textFieldSaveTimers.delete(`${r.id}-comment`);
         }
 
         const pendingTotalsTimer = totalsFieldSaveTimers.get(r.id);
