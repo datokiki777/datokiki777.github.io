@@ -143,7 +143,7 @@ function renderReview() {
     }
 
     fullHtml += `
-      <section class="review-card review-group-card ${colorClass} ${collapsed ? "is-collapsed" : "is-expanded"}" style="${g.archived ? 'opacity:0.7;' : ''}">
+      <section class="review-card review-group-card ${colorClass} ${collapsed ? "is-collapsed" : "is-expanded"}">
         <button
           type="button"
           class="review-group-toggle"
