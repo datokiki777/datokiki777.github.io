@@ -337,32 +337,7 @@ function openStatusListModal(status, clients) {
   }
   
   async function goToClientFromStatusList(item) {
-    if (!item) return;
-
-    appState.activeGroupId = item.groupId;
-    await saveState();
-
-    await setPeriodCollapsed(item.periodId, false);
-    await setMode("edit");
-    render();
-
-    requestAnimationFrame(() => {
-      const periodEl = document.querySelector(`.period[data-period-id="${item.periodId}"]`);
-      const rowEl = document.querySelector(`tr[data-row-id="${item.rowId}"]`);
-
-      if (periodEl) {
-        periodEl.classList.remove("is-collapsed");
-      }
-
-      if (rowEl) {
-        rowEl.scrollIntoView({ behavior: "smooth", block: "center" });
-        rowEl.classList.add("row-highlight");
-
-        setTimeout(() => {
-          rowEl.classList.remove("row-highlight");
-        }, 1800);
-      }
-    });
+    await openClientRowInEdit(item);
   }
 
   function bindStatusListItemClicks(clients) {

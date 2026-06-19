@@ -62,33 +62,60 @@ function highlightMatch(text, query) {
    Go to Client from Search Result
 ========================= */
 
-async function goToClientFromSearch(item) {
+function waitForClientRow(rowId, attempts = 30) {
+  return new Promise((resolve) => {
+    const findRow = (remaining) => {
+      const rowEl = document.querySelector(`tr[data-row-id="${rowId}"]`);
+      if (rowEl || remaining <= 0) {
+        resolve(rowEl || null);
+        return;
+      }
+
+      requestAnimationFrame(() => findRow(remaining - 1));
+    };
+
+    findRow(attempts);
+  });
+}
+
+async function openClientRowInEdit(item) {
   if (!item) return;
 
-  appState.activeGroupId = item.groupId;
-  await saveState();
+  const targetGroup = (appState.groups || []).find((group) => group.id === item.groupId);
+  if (!targetGroup) return;
+
+  const targetWorkspace = targetGroup.archived === true ? "archive" : "active";
+  appState.workspaceMode = targetWorkspace;
+  appState.activeGroupId = targetGroup.id;
+
+  if (targetWorkspace === "archive") {
+    appState.lastActiveGroupIdArchive = targetGroup.id;
+  } else {
+    appState.lastActiveGroupIdActive = targetGroup.id;
+  }
 
   await setPeriodCollapsed(item.periodId, false);
-  setMode("edit");
-  render();
+  await setMode("edit");
 
-  requestAnimationFrame(() => {
-    const periodEl = document.querySelector(`.period[data-period-id="${item.periodId}"]`);
-    const rowEl = document.querySelector(`tr[data-row-id="${item.rowId}"]`);
+  const rowEl = await waitForClientRow(item.rowId);
+  const periodEl = document.querySelector(`.period[data-period-id="${item.periodId}"]`);
 
-    if (periodEl) {
-      periodEl.classList.remove("is-collapsed");
-    }
+  if (periodEl) {
+    periodEl.classList.remove("is-collapsed");
+  }
 
-    if (rowEl) {
-      rowEl.scrollIntoView({ behavior: "smooth", block: "center" });
-      rowEl.classList.add("row-highlight");
+  if (rowEl) {
+    rowEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    rowEl.classList.add("row-highlight");
 
-      setTimeout(() => {
-        rowEl.classList.remove("row-highlight");
-      }, 1800);
-    }
-  });
+    setTimeout(() => {
+      rowEl.classList.remove("row-highlight");
+    }, 1800);
+  }
+}
+
+async function goToClientFromSearch(item) {
+  await openClientRowInEdit(item);
 }
 
 /* =========================
