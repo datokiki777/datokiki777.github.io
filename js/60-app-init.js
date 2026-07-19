@@ -73,6 +73,10 @@ async function initApp() {
       }
     }
 
+    if (typeof initAuthLockAsync === "function") {
+      await initAuthLockAsync();
+    }
+
     if (typeof syncFromCloudOnStartup === "function") {
       await syncFromCloudOnStartup();
     }
