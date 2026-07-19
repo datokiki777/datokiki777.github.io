@@ -529,6 +529,26 @@
     </div>
   </div>
 </div>
+
+<!-- Cloud Login Modal -->
+<div id="authLockModal" class="modal-backdrop pin-lock-backdrop" style="display:none;">
+  <div class="modal pin-lock-modal">
+    <div class="modal-title">Cloud Sign In</div>
+    <div class="modal-text">Sign in once on this device to enable cloud sync.</div>
+    <div style="margin-top:12px;">
+      <input id="authEmailInput" type="email" class="review-search-input pin-lock-input"
+        placeholder="Email" autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" style="margin-bottom:8px;" />
+      <input id="authPasswordInput" type="password" class="review-search-input pin-lock-input"
+        placeholder="Password" autocomplete="current-password" />
+    </div>
+    <div id="authLockError" class="pin-lock-error" style="display:none;">
+      Wrong email or password. Try again.
+    </div>
+    <div class="modal-actions">
+      <button id="authUnlockBtn" class="btn primary">Sign In</button>
+    </div>
+  </div>
+</div>
       
       <!-- Top Menu -->
 <div id="topMenuBackdrop" class="top-menu-backdrop" style="display:none;">
@@ -799,6 +819,7 @@
     try {
       await loadExternalScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
       await loadExternalScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js");
+      await loadExternalScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js");
 
       if (!window.firebase) {
         throw new Error("Firebase SDK unavailable");
@@ -809,6 +830,7 @@
       }
 
       window.__db = firebase.firestore();
+      window.__auth = firebase.auth();
       return true;
     } catch (error) {
       window.__firebaseInitError = String(error?.message || error || "Cloud sync unavailable");
@@ -829,6 +851,7 @@
 </script>
 
 <script src="js/17-cloud-sync.js"></script>
+<script src="js/18-auth.js"></script>
 
 <script src="js/30-render-overview.js"></script>
 <script src="js/31-render-periods.js"></script>
