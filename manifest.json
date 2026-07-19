@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "Client Totals",
   "short_name": "Totals",
   "start_url": "./",
