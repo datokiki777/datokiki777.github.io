@@ -1,6 +1,6 @@
-const CACHE = "client-totals-shell-v8.11";
-const RUNTIME_CACHE = "client-totals-runtime-v8.11";
-const CDN_CACHE = "client-totals-cdn-v8.11";
+const CACHE = "client-totals-shell-v8.12";
+const RUNTIME_CACHE = "client-totals-runtime-v8.12";
+const CDN_CACHE = "client-totals-cdn-v8.12";
 
 const CDN_ASSETS = [
   "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
@@ -34,6 +34,7 @@ const CORE_ASSETS = [
   "./js/15-theme.js",
   "./js/16-import-export.js",
   "./js/17-cloud-sync.js",
+  "./js/18-auth.js",
   "./js/20-actions-groups.js",
   "./js/21-actions-periods.js",
   "./js/22-actions-rows.js",
