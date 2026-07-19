@@ -58,6 +58,9 @@ function initAuthLockAsync() {
         showAuthLockError(false);
       } catch (error) {
         console.error("Sign in failed:", error);
+        if (authLockError) {
+          authLockError.textContent = "Error: " + (error?.code || "") + " " + (error?.message || "Sign in failed");
+        }
         showAuthLockError(true);
       } finally {
         authUnlockBtn.disabled = false;
