@@ -480,8 +480,11 @@ async function handleCloudSave() {
     const ok = await triggerImmediateCloudSync("manual");
 
     if (!ok) {
+      const authState = window.__auth?.currentUser
+        ? ("signed in as " + window.__auth.currentUser.email)
+        : "NOT signed in";
       await askConfirm(
-        "Cloud Save failed. Data is still saved locally on this device.",
+        "Cloud Save failed (" + authState + "): " + (cloudLastError || "unknown error") + "\n\nData is still saved locally on this device.",
         "Cloud Sync",
         { singleButton: true, okText: "OK" }
       );
@@ -495,8 +498,11 @@ async function handleCloudSave() {
     );
   } catch (error) {
     console.error("Cloud Save failed:", error);
+    const authState = window.__auth?.currentUser
+      ? ("signed in as " + window.__auth.currentUser.email)
+      : "NOT signed in";
     await askConfirm(
-      "Cloud Save failed.",
+      "Cloud Save failed (" + authState + "): " + String(error?.message || error),
       "Cloud Sync",
       { singleButton: true, okText: "OK" }
     );
