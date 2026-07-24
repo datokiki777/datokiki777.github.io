@@ -90,6 +90,7 @@ const pinUnlockBtn = document.getElementById("pinUnlockBtn");
 const pinLockError = document.getElementById("pinLockError");
 
 const dataBackupBtn = document.getElementById("dataBackupBtn");
+const cloudSignOutBtn = document.getElementById("cloudSignOutBtn");
 const dataBackupModal = document.getElementById("dataBackupModal");
 const dataBackupClose = document.getElementById("dataBackupClose");
 
