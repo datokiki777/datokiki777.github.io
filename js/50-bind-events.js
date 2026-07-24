@@ -313,6 +313,31 @@ dataBackupBtn?.addEventListener("click", async () => {
   dataBackupModal.style.display = "flex";
 });
 
+cloudSignOutBtn?.addEventListener("click", async () => {
+  // close top menu first
+  if (typeof closeTopMenu === "function") {
+    closeTopMenu();
+  } else {
+    topMenuBackdrop.style.display = "none";
+  }
+
+  const confirmed = await askConfirm(
+    "Sign out of cloud sync on this device? You will need to sign in again to sync with the cloud.",
+    "Sign Out",
+    { okText: "Sign Out", cancelText: "Cancel" }
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await window.__auth?.signOut();
+  } catch (error) {
+    console.error("Sign out failed:", error);
+  }
+
+  window.location.reload();
+});
+
 dataBackupClose?.addEventListener("click", () => {
   dataBackupModal.style.display = "none";
 });
