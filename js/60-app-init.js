@@ -42,10 +42,7 @@ async function ensureAppChromeInitialized() {
     appChromeBoot.menu = true;
   }
 
-  if (!appChromeBoot.pin) {
-    await initPinLockAsync();
-    appChromeBoot.pin = true;
-  }
+  appChromeBoot.pin = true;
 
   if (!appChromeBoot.status) {
     initStatusBadgeActions();
@@ -71,6 +68,10 @@ async function initApp() {
       } catch (e) {
         // local-only mode is allowed
       }
+    }
+
+    if (typeof initPinLockAsync === "function") {
+      await initPinLockAsync();
     }
 
     if (typeof initAuthLockAsync === "function") {
