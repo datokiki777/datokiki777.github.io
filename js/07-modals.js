@@ -64,6 +64,8 @@ function closePinLockModal() {
   setAppInteractionLocked(false);
 }
 
+let pinUnlockResolve = null;
+
 async function tryUnlockApp() {
   const value = (pinLockInput?.value || "").replace(/\D/g, "").slice(0, 6);
 
@@ -81,33 +83,42 @@ async function tryUnlockApp() {
   isUnlocked = true;
   await setDeviceVerified(true);
   closePinLockModal();
+
+  if (pinUnlockResolve) {
+    pinUnlockResolve();
+    pinUnlockResolve = null;
+  }
 }
 
-async function initPinLockAsync() {
-  if (pinLockInput) {
-    pinLockInput.addEventListener("input", () => {
-      pinLockInput.value = pinLockInput.value.replace(/\D/g, "").slice(0, 6);
-      showPinLockError(false);
-    });
+function initPinLockAsync() {
+  return new Promise(async (resolve) => {
+    if (pinLockInput) {
+      pinLockInput.addEventListener("input", () => {
+        pinLockInput.value = pinLockInput.value.replace(/\D/g, "").slice(0, 6);
+        showPinLockError(false);
+      });
 
-    pinLockInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        tryUnlockApp();
-      }
-    });
-  }
+      pinLockInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          tryUnlockApp();
+        }
+      });
+    }
 
-  pinUnlockBtn?.addEventListener("click", tryUnlockApp);
+    pinUnlockBtn?.addEventListener("click", tryUnlockApp);
 
-  const isVerified = await isDeviceVerified();
-  if (isVerified) {
-    isUnlocked = true;
-    closePinLockModal();
-  } else {
-    isUnlocked = false;
-    openPinLockModal();
-  }
+    const isVerified = await isDeviceVerified();
+    if (isVerified) {
+      isUnlocked = true;
+      closePinLockModal();
+      resolve();
+    } else {
+      isUnlocked = false;
+      openPinLockModal();
+      pinUnlockResolve = resolve;
+    }
+  });
 }
 
 // Legacy sync wrapper for backward compatibility
