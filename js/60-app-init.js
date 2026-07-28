@@ -117,6 +117,7 @@ async function initApp() {
   // Remove splash screen after init
   requestAnimationFrame(() => {
     document.body.classList.remove("booting");
+    document.dispatchEvent(new Event("app:ready"));
   });
 }
 
