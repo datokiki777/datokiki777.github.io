@@ -874,18 +874,27 @@
 <script src="js/99-debug.js"></script>
 
 <script>
-  window.addEventListener("load", () => {
+  (() => {
     const splash = document.getElementById("startupSplash");
     if (!splash) return;
 
-    setTimeout(() => {
+    let hidden = false;
+    const hideSplash = () => {
+      if (hidden) return;
+      hidden = true;
       splash.classList.add("is-hidden");
-    }, 850);
+      setTimeout(() => splash.remove(), 400);
+    };
 
-    setTimeout(() => {
-      splash.remove();
-    }, 1250);
-  });
+    // Hide as soon as the app signals it has finished loading data,
+    // running startup logic, and rendering the UI (see 60-app-init.js).
+    document.addEventListener("app:ready", hideSplash);
+
+    // Safety net: never trap the user behind the splash indefinitely.
+    // Any PIN/login modal renders above the splash (higher z-index),
+    // so it stays usable even if this fallback fires first.
+    setTimeout(hideSplash, 10000);
+  })();
 </script>
       
 </body>
